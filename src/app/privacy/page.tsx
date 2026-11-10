@@ -101,6 +101,12 @@ const SECTIONS: { title: string; blocks: Block[] }[] = [
       {
         p: "Access to your information is limited to the people who need it to care for you. Data is encrypted in transit, and genotypes never appear on receipts you share. We review our security regularly.",
       },
+      {
+        p: "Your genotypes and lab reports are encrypted at rest as well as in transit, and are never used for research without your separate consent.",
+      },
+      {
+        p: "If a breach puts your data at risk, we will notify the Nigeria Data Protection Commission within 72 hours and tell affected users without undue delay.",
+      },
     ],
   },
   {

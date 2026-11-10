@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Poppins } from "next/font/google";
 import localFont from "next/font/local";
 import Script from "next/script";
+import CookieBanner from "@/components/CookieBanner";
 import InProgressModal from "@/components/InProgressModal";
 import AskNoura from "@/components/AskNoura";
 import "./globals.css";
@@ -54,6 +55,7 @@ export default function RootLayout({
         {/* Outside any page wrapper so it stays pinned to the viewport on every page. */}
         <AskNoura />
         <InProgressModal />
+        <CookieBanner />
       </body>
     </html>
   );

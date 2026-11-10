@@ -30,7 +30,7 @@ const COLUMNS: { title: string; links: FooterLink[] }[] = [
   },
   {
     title: "Legal",
-    links: [{ label: "Terms of service", href: TERMS }, { label: "Privacy policy", href: PRIVACY }],
+    links: [{ label: "Terms of service", href: TERMS }, { label: "Privacy policy", href: PRIVACY }, { label: "Cookie policy", href: "/cookies" }],
   },
 ];
 
@@ -60,7 +60,7 @@ export default function Footer() {
       {/* The same side margins as the rest of the page. From 798px up it is one line: the partnership on the left, the app
           buttons on the right. Below that they stack, both centred, with the same gap above, between and below. */}
       <div className="gutter flex flex-col items-center [--s:min(var(--text-hero-sub),calc((100vw-2.5rem)/25.8))] [--m:calc((100vw-2.5rem-9.62*var(--s))/14.98)] gap-y-[calc(var(--spacing-section)*0.7)] py-[calc(var(--spacing-section)*0.7)] min-[798px]:flex-row min-[798px]:flex-wrap min-[1100px]:flex-nowrap min-[1100px]:items-stretch min-[798px]:justify-between min-[798px]:gap-x-[calc(28*var(--u))] min-[798px]:pb-[calc(var(--spacing-section)/6)] min-[798px]:pt-[calc(var(--spacing-section)/2)]">
-        <Partnership compact />
+        <Partnership compact note="© 2026 AwaDoc" />
         {/* The links, like Rise: two columns on a phone (up to 797px the second column starts under the IMSA logo, the first under the AwaDoc logo), a row of four on a wide screen: above the partnership and the app buttons, and from 1100px between them (the partnership stacked on the left, the app buttons on the right). */}
         <nav
           aria-label="Footer"
@@ -98,7 +98,7 @@ export default function Footer() {
       </div>
 
       {/* The bottom row. On a phone: the social icons, then the small print under them. From 798px, like Rise: the small print at the left, the social handles (icons only) in one row at the right. On a phone, just the icons. */}
-      <div className="gutter flex flex-col items-center gap-y-[calc(16*var(--u))] pb-[calc(var(--spacing-section)*0.5)] min-[798px]:flex-row min-[798px]:items-center min-[798px]:justify-between">
+      <div className="gutter flex flex-col items-center gap-y-[calc(16*var(--u))] pb-[calc(var(--spacing-section)*0.5)] min-[798px]:flex-row min-[798px]:items-center min-[798px]:justify-between min-[1100px]:justify-end">
                 <ul aria-label="AwaDoc on social media" className="flex flex-wrap justify-center min-[798px]:justify-end gap-x-[calc(28*var(--u))] gap-y-[calc(14*var(--u))] max-sm:gap-x-[calc(26*var(--u))]">
           {SOCIALS.map(({ label, href, Icon }) => (
             <li key={label}>
@@ -109,7 +109,7 @@ export default function Footer() {
             </li>
           ))}
         </ul>
-        <p className="text-justify min-[798px]:order-first text-[calc(var(--text-hero-sub)*0.7)] font-medium leading-relaxed tracking-[-0.02em] text-muted min-[798px]:text-left">
+        <p className="text-justify min-[798px]:order-first min-[1100px]:hidden text-[calc(var(--text-hero-sub)*0.7)] font-medium leading-relaxed tracking-[-0.02em] text-muted min-[798px]:text-left">
           © 2026 AwaDoc
         </p>
       </div>

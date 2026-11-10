@@ -74,6 +74,12 @@ const items: { id: string; question: string; answer: ReactNode }[] = [
       "Couples where the woman is 18 to 30 can book treatment online. If she is older, book counselling first. A doctor will talk through your options and chances of success.",
   },
   {
+    id: "pay",
+    question: "How do we pay?",
+    answer:
+      "In one payment at checkout. In Nigeria, pay by card, bank transfer or USSD. From abroad, pay by card, mobile money or international transfer.",
+  },
+  {
     id: "cost",
     question: "What does everything cost?",
     answer: (
@@ -85,12 +91,6 @@ const items: { id: string; question: string; answer: ReactNode }[] = [
         </p>
       </div>
     ),
-  },
-  {
-    id: "pay",
-    question: "How do we pay?",
-    answer:
-      "In one payment at checkout. In Nigeria, pay by card, bank transfer or USSD. From abroad, pay by card, mobile money or international transfer.",
   },
   {
     id: "dna",
@@ -120,7 +120,7 @@ const items: { id: string; question: string; answer: ReactNode }[] = [
     id: "abroad",
     question: "We don't live in Nigeria. Can we book?",
     answer:
-      "Yes. Virtual counselling works from any country. Procedures happen at IMSA in Abuja, and we help you plan the visits.",
+      "Yes. Virtual counselling works from any country. Procedures happen at IMSA in Abuja. We arrange your appointments at IMSA, book accommodation near the clinic, and plan your trips around each stage, so you spend as few days in Abuja as possible.",
   },
   {
     id: "aa",
@@ -202,8 +202,8 @@ const items: { id: string; question: string; answer: ReactNode }[] = [
           as long as your care and medical records rules require.
         </Block>
         <Block title="Your rights">
-          You can ask to see, correct or delete your data, and withdraw consent at any time, by contacting
-          AwaDoc&apos;s Data Protection Officer through www.awadoc.com. You can also complain to the Nigeria Data
+          You can ask to see, correct or delete your data, and withdraw consent at any time, by emailing
+          AwaDoc&apos;s Data Protection Officer at dpo@awadoc.com. You can also complain to the Nigeria Data
           Protection Commission.
         </Block>
       </div>
