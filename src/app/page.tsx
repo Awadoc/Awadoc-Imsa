@@ -63,7 +63,7 @@ export default function Home() {
               <p className="mb-8 w-0 min-w-full text-hero-sub font-medium leading-relaxed tracking-[-0.035em] text-muted hero-sub">
                 AS + AS or AS + SS? IVF with embryo testing can prevent sickle cell. Book now, wherever you are.
               </p>
-              <div className="flex w-0 min-w-full flex-wrap gap-3">
+              <div className="flex w-0 min-w-full flex-wrap gap-3 md:flex-nowrap">
                 <StartBookingButton />
                 <ReadMorePgtmButton />
               </div>

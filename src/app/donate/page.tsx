@@ -56,8 +56,8 @@ export default function DonatePage() {
 
       <main className="gutter relative z-10 flex h-full items-end pb-[max(2rem,env(safe-area-inset-bottom))] md:items-center md:pb-0">
         <div className="donate-copy book-rise max-w-[36em]" style={{ animationDelay: "120ms" }}>
-          <h1 className="font-heading text-h2 font-medium leading-[1.06] [-webkit-text-stroke:0.015em_currentColor]">Help a couple get the baby of their dreams</h1>
-          <p className="mt-[1em] text-justify text-hero-sub font-medium leading-relaxed tracking-[-0.035em] text-muted [[data-theme=light]_&]:text-ink">
+          <h1 className="font-heading text-h2 font-medium leading-[1.06] [-webkit-text-stroke:0.015em_currentColor] in-data-[theme=light]:text-[#0a4a39]">Help a couple get the baby of their dreams</h1>
+          <p className="mt-[1em] text-justify text-hero-sub font-medium leading-relaxed tracking-[-0.035em] text-muted in-data-[theme=light]:text-[#0a4a39]">
             Embryo testing (PGT-M) lets couples with AS and SS genotypes have children free of sickle cell disease, but most families can’t afford it. Your gift goes
             towards counselling, tests and treatment for couples who need help to pay.
           </p>

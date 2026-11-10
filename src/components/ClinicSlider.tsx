@@ -17,8 +17,8 @@ export default function ClinicSlider() {
     <section id="about" aria-label="About AwaDoc" className="relative z-10 mt-[calc(var(--spacing-section)*1.5)] px-3 sm:px-[5vw]">
       <div className="overflow-hidden rounded-[calc(32*var(--u))] border border-white/40 bg-linear-to-br from-bg/55 via-bg/40 to-bg/28 p-[calc(20*var(--u))] shadow-[0_24px_60px_-16px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.5)] backdrop-blur-md md:p-[calc(48*var(--u))]">
         <div className="@container mx-auto max-w-[56em]">
-          <h2 className="whitespace-nowrap text-center font-heading text-[min(var(--text-h2),calc(100cqw/16.5))] font-medium leading-[1.06] [-webkit-text-stroke:0.015em_currentColor]">
-            First clinical research lab in Africa
+          <h2 className="text-balance text-center font-heading text-[min(var(--text-h2),calc(100cqw/16.5))] font-medium leading-[1.06] [-webkit-text-stroke:0.015em_currentColor]">
+            Embryo Testing for sickle cell, Done in Nigeria
           </h2>
           <p className="mt-[1.6em] text-justify text-hero-sub font-medium leading-relaxed tracking-[-0.035em] text-muted">
             Our aim is to end the passing on of sickle cell disease, one family at a time. We give couples clear answers

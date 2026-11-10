@@ -75,7 +75,7 @@ const SECTIONS: { title: string; blocks: Block[] }[] = [
       {
         ul: [
           "Prices are shown in Nigerian naira (₦). Amounts in other currencies are approximate and for information only.",
-          "Payment is made in full, in one payment, at checkout by card, bank transfer or mobile money through a licensed payment partner.",
+          "Payment is made in full, in one payment, at checkout by card, bank transfer, USSD or mobile money through a licensed payment partner.",
           "Procedure prices marked “estimate” are confirmed at your assessment. If the confirmed price is lower, we refund the difference; if it’s higher, we invoice you before treatment continues, and you may cancel instead.",
           "Travel, accommodation, extra IVF cycles and pregnancy care are not included unless stated.",
         ],

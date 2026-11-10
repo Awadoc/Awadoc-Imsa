@@ -68,6 +68,12 @@ const items: { id: string; question: string; answer: ReactNode }[] = [
     ),
   },
   {
+    id: "age",
+    question: "Who can book treatment?",
+    answer:
+      "Couples where the woman is 18 to 30 can book treatment online. If she is older, book counselling first. A doctor will talk through your options and chances of success.",
+  },
+  {
     id: "cost",
     question: "What does everything cost?",
     answer: (
@@ -84,7 +90,7 @@ const items: { id: string; question: string; answer: ReactNode }[] = [
     id: "pay",
     question: "How do we pay?",
     answer:
-      "In one payment at checkout, by card, bank transfer or USSD in Nigeria, or by card or international transfer from abroad.",
+      "In one payment at checkout. In Nigeria, pay by card, bank transfer or USSD. From abroad, pay by card, mobile money or international transfer.",
   },
   {
     id: "dna",

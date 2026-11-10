@@ -64,7 +64,7 @@ const SECTIONS: { title: string; blocks: Block[] }[] = [
         ul: [
           ["AS + AS", "25% AA, 50% AS, 25% SS in each pregnancy. PGT-M can help."],
           ["AS + SS", "50% AS, 50% SS. PGT-M can help."],
-          ["AS + SC", "25% AA, 25% AS, 25% AC, 25% SC. PGT-M can help."],
+          ["AS + SC", "25% AS, 25% AC, 25% SS, 25% SC in each pregnancy. That’s a 50% chance of sickle cell disease. PGT-M can help."],
           ["AC + SS", "50% AS, 50% SC. PGT-M can help."],
           ["AC + AC", "25% AA, 50% AC, 25% CC. No child can have sickle cell disease, so PGT-M isn’t needed for sickle cell."],
           ["AA + SS", "every child is AS (a carrier). PGT-M isn’t needed."],

@@ -28,7 +28,7 @@ const STEPS = [
   {
     title: "Payment",
     note: "One secure payment",
-    text: "Review it all and pay once, by card, bank or mobile money.",
+    text: "Review it all and pay once, by card, bank transfer, USSD or mobile money.",
   },
 ];
 
