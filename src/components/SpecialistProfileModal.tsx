@@ -3,7 +3,8 @@
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { useInProgressStore } from "@/store/useInProgressStore";
+import { useRouter } from "next/navigation";
+import { startBooking } from "@/lib/startBooking";
 
 const HIGHLIGHTS = [
   {
@@ -43,7 +44,7 @@ const CAREER = [
 // and the page behind it stops scrolling while it is open.
 export default function SpecialistProfileModal({ open, onClose }: { open: boolean; onClose: () => void }) {
   const dialogRef = useRef<HTMLDivElement>(null);
-  const showInProgress = useInProgressStore((s) => s.show);
+  const router = useRouter();
 
   // `shown` drives the fade and grow; `present` keeps the modal mounted while it animates out.
   const [shown, setShown] = useState(false);
@@ -159,12 +160,12 @@ export default function SpecialistProfileModal({ open, onClose }: { open: boolea
           ))}
         </ul>
 
-        {/* Booking is not open yet, so, like "Start booking", this closes the profile and shows the in progress notice. */}
+        {/* Closes the profile and goes to the booking page. */}
         <button
           type="button"
           onClick={() => {
             onClose();
-            showInProgress();
+            void startBooking(router);
           }}
           style={{ animationDelay: "620ms" }}
           className="book-rise mx-auto mt-[1.8em] flex min-h-btn w-full cursor-pointer items-center justify-center rounded-[calc(14*var(--u))] border border-ink bg-ink px-[1.4em] py-[0.7em] text-btn font-bold text-bg transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-brand hover:bg-brand hover:text-[#07110c] hover:shadow-[0_10px_28px_-8px_var(--color-brand)] active:translate-y-0 active:scale-[0.97] motion-reduce:transition-none motion-reduce:hover:translate-y-0 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-500 sm:w-fit"

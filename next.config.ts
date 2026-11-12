@@ -7,6 +7,10 @@ const nextConfig: NextConfig = {
   // Set NEXT_DIST_DIR to build somewhere else (for checks) without touching the .next folder a running
   // dev server is using.
   distDir: process.env.NEXT_DIST_DIR || ".next",
+  // Genotype reports are sent to the booking service through a server action: two files of up to 20 MiB each plus the form.
+  experimental: {
+    serverActions: { bodySizeLimit: "45mb" },
+  },
   turbopack: {
     root: path.resolve(__dirname),
   },

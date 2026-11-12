@@ -5,47 +5,80 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, type ComponentType } from "react";
 import Logo from "@/components/Logo";
 import ThemeToggle from "@/components/ThemeToggle";
-import { formatPrice } from "@/lib/currency";
-import { useCurrencyStore } from "@/store/useCurrencyStore";
-import { TOTAL_STEPS, totalNgn, useBookingStore, type BookingData } from "@/store/useBookingStore";
+import { registerBooking, startPayment } from "@/app/actions/imsa";
+import { loadBookingConfig } from "@/lib/imsa/loadConfig";
+import { useLoaderStore } from "@/store/useLoaderStore";
+import { buildSubmission, COUNTRY_CODES, FIELD_LABELS, fullName, watLabel } from "@/lib/imsa/map";
+import type { ActionError } from "@/lib/imsa/types";
+import { proofIsFresh, TOTAL_STEPS, useBookingStore, type BookingData } from "@/store/useBookingStore";
 import {
-  formatDate,
   formatTime,
   StepBook,
-  StepDone,
-  StepGenotypes,
+  StepService,
   StepLabs,
   StepLocation,
+  StepPartner,
   StepPay,
-  StepRegister,
+  StepVerify,
+  StepWho,
+  StepAbout,
+  StepHealth,
 } from "@/components/booking/steps";
+import { dayLabel } from "@/lib/imsa/map";
+import { Notice } from "@/components/booking/fields";
 
 const STEPS: { title: string; sub: string; Body: ComponentType; wide?: boolean }[] = [
-  { title: "Register as a couple", sub: "", Body: StepRegister },
-  { title: "Select your genotypes", sub: "", Body: StepGenotypes },
+  { title: "What would you like to book?", sub: "You can start with counselling and book treatment later.", Body: StepService },
+  { title: "Who is this booking for?", sub: "You'll always be the main contact for this booking.", Body: StepWho },
+  { title: "About you", sub: "Tell us about you first. Your partner is next.", Body: StepAbout },
+  { title: "Your health details", sub: "", Body: StepHealth },
+  { title: "Your partner's information", sub: "", Body: StepPartner },
   { title: "Where do you live?", sub: "", Body: StepLocation },
-  { title: "Choose counselling, procedures and a time", sub: "Book counselling, procedures, or both in one go. Pick a time for your first appointment at the end.", Body: StepBook, wide: true },
-  { title: "Lab results and test preparation", sub: "Share your genotype reports so a doctor can check them before anything starts.", Body: StepLabs },
-  { title: "Review and pay", sub: "Your booking is held. Check the details, then pay to confirm it.", Body: StepPay },
+  { title: "Verify your email", sub: "", Body: StepVerify },
+  { title: "Pick a time", sub: "Choose when you would like to be seen, then read and agree to the consents.", Body: StepBook, wide: true },
+  { title: "Lab results", sub: "Share your genotype reports so a doctor can check them before anything starts.", Body: StepLabs },
+  { title: "Review and pay", sub: "", Body: StepPay },
 ];
-
-const DONE = { title: "Booking confirmed", sub: "You're all set. We'll see you both soon.", Body: StepDone, wide: false };
 
 const filled = (...v: string[]) => v.every((x) => x.trim().length > 0);
 
-function canContinue(step: number, d: BookingData) {
+function canContinue(step: number, d: BookingData, proof: ReturnType<typeof useBookingStore.getState>["proof"], packageOn: boolean) {
   switch (step) {
     case 1:
-      return filled(d.first1, d.last1, d.first2, d.last2, d.relationship) && /^\S+@\S+\.\S+$/.test(d.email.trim()) && d.phone.replace(/\D/g, "").length >= 7;
+      return d.product === "virtual" || (d.product === "package" && packageOn);
     case 2:
-      return !!d.geno1 && !!d.geno2 && filled(d.lab, d.age, d.ivf);
+      return d.who === "self" || (d.who === "dependent" && d.dependentRel !== "");
     case 3:
-      return filled(d.country, d.state, d.street, d.city);
+      return fullName(d.first1, d.last1).length >= 3 && filled(d.first1, d.last1) && /^\S+@\S+\.\S+$/.test(d.email.trim()) && d.phone.replace(/\D/g, "").length >= 7;
     case 4:
-      return !!d.counselling && !!d.date && d.hour !== null && d.consentCare && d.consentShare;
+      return filled(d.gender1, d.yob1, d.lab) && (d.who === "dependent" || filled(d.ivf)) && !!d.geno1 && (d.who === "dependent" ? filled(d.patientFirst, d.patientLast) && fullName(d.patientFirst, d.patientLast).length >= 3 : filled(d.relationship));
+    case 5:
+      return d.who === "dependent" || (filled(d.first2, d.last2, d.gender2, d.yob2) && !!d.geno2 && fullName(d.first2, d.last2).length >= 3);
+    case 6:
+      return filled(d.country, d.state, d.street, d.city) && !!COUNTRY_CODES[d.country];
+    case 7:
+      return proofIsFresh(proof, d.email);
+    case 8:
+      return (
+        (d.product === "virtual" ? !!d.slotId : d.product === "package" && packageOn ? !!d.date && d.hour !== null : false) &&
+        d.consentCare &&
+        d.consentShare &&
+        d.consentAuthority
+      );
     default:
       return true;
   }
+}
+
+/** Which step a problem with a field belongs to (the API names fields like body.patient.yearOfBirth). */
+function stepForField(path: string) {
+  const p = path.replace(/^body\./, "");
+  if (p.startsWith("booker") || p.startsWith("patient") || p.startsWith("relationship")) return p.startsWith("booker") ? 3 : 4;
+  if (p.startsWith("applicationType") || p.startsWith("dependentRelationship")) return 2;
+  if (p.startsWith("partner")) return 5;
+  if (p.startsWith("location")) return 6;
+  if (p.startsWith("emailVerificationId")) return 7;
+  return 8;
 }
 
 // The booking flow as a full page (/book): the title, "% completed" and step count on top with a segmented
@@ -73,8 +106,7 @@ function setThemeColorMeta(color: string) {
 
 export default function BookingFlow() {
   const router = useRouter();
-  const { step, dir, data, next, back, goTo, reset } = useBookingStore();
-  const currency = useCurrencyStore((s) => s.currency);
+  const { step, dir, data, next: nextStep, back: backStep, goTo, config, configState, proof, receipt, idem, set, setConfig, setProof, setIdem, setReceipt } = useBookingStore();
   // Leaving for the home page: the page fades down and away first, then the home page loads and fades in.
   const [leaving, setLeaving] = useState(false);
   const goHome = (e?: { preventDefault: () => void }) => {
@@ -85,30 +117,24 @@ export default function BookingFlow() {
     window.setTimeout(() => router.push("/"), reduce ? 0 : 300);
   };
 
-  // After Pay, the button shows a short "confirming" state before the confirmation screen.
-  const [paying, setPaying] = useState(false);
-  const payTimer = useRef<number | undefined>(undefined);
-  useEffect(() => () => window.clearTimeout(payTimer.current), []);
+  // `busy` is true while the booking is being saved or the payment page is being opened.
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
 
-  // On phones the Continue button is exactly as wide and as tall as the Ask Noura button next to it. Ask Noura sizes itself
-  // by its content, so its width is measured and copied.
-  const [match, setMatch] = useState<{ w: number; h: number } | null>(null);
+  // The service's settings (which products are open, prices, the consent version, ...) are read once from the server.
+  // "Start booking" has normally loaded them already; opening /book directly shows the AwaDoc loader until they are in.
+  const loadConfig = loadBookingConfig;
+  const { show: showLoader, hide: hideLoader } = useLoaderStore.getState();
   useEffect(() => {
-    const noura = document.querySelector<HTMLElement>('button[aria-label="Ask Noura"]');
-    if (!noura) return;
-    const measure = () => {
-      const r = noura.getBoundingClientRect();
-      setMatch(window.innerWidth < 640 ? { w: Math.round(r.width), h: Math.round(r.height) } : null);
-    };
-    measure();
-    const ro = new ResizeObserver(measure);
-    ro.observe(noura);
-    window.addEventListener("resize", measure);
-    return () => {
-      ro.disconnect();
-      window.removeEventListener("resize", measure);
-    };
+    if (useBookingStore.getState().configState === "ready") return;
+    showLoader();
+    void loadBookingConfig();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+  // Once the options are in (or known to be unavailable) the loader fades away and the page shows.
+  useEffect(() => {
+    if (configState !== "loading") hideLoader();
+  }, [configState, hideLoader]);
 
   // The phone browser colours its status bar / top edge from the page's background. The page's green glow is
   // painted on <html> (not on an inner box), and the browser is told the same top colour, so the whole screen,
@@ -139,161 +165,269 @@ export default function BookingFlow() {
   // Each new step starts at the top of the page.
   useEffect(() => {
     window.scrollTo({ top: 0 });
+    scroller.current?.scrollTo({ top: 0 });
   }, [step]);
 
-  const done = step > TOTAL_STEPS;
-  const cfg = done ? DONE : STEPS[step - 1];
+  const scroller = useRef<HTMLDivElement>(null);
+  // For someone else's booking the two steps are told apart: the first is about you (the contact), the second about the patient.
+  const base = STEPS[step - 1];
+  const dep = data.who === "dependent";
+  const cfg =
+    dep && step === 3
+      ? { ...base, title: "Your details", sub: "You are the main contact for this booking. The patient's details come next." }
+      : dep && step === 4
+        ? { ...base, title: "The patient's details", sub: "Now tell us about the person this booking is for." }
+        : base;
   const { Body } = cfg;
   const wide = !!cfg.wide;
-  const ok = canContinue(step, data);
-  const total = totalNgn(data);
-  const { symbol, digits } = formatPrice(total, currency);
-  const money = `${symbol}${digits}`;
+  const ok = canContinue(step, data, proof, !!config?.packageEnabled);
+  const locked = !!receipt; // once the booking is saved, the details can't be changed here
 
-  const label = done ? "Done" : paying ? "Confirming..." : step === TOTAL_STEPS ? `Pay ${money}` : "Continue";
+  // A booking for someone else has no partner step (the patient's step covers the person), so it is skipped and left out of the count.
+  const PARTNER = 5;
+  const skipPartner = data.who === "dependent";
+  const next = () => (skipPartner && step === PARTNER - 1 ? goTo(PARTNER + 1) : nextStep());
+  const back = () => (skipPartner && step === PARTNER + 1 ? goTo(PARTNER - 1) : backStep());
+  const visible = STEPS.map((s, i) => ({ s, n: i + 1 })).filter((v) => !(skipPartner && v.n === PARTNER));
+  const shownStep = visible.findIndex((v) => v.n === step) + 1;
+  const shownTotal = visible.length;
+  const label = busy ? (receipt ? "Opening payment..." : "Saving...") : step === TOTAL_STEPS ? (receipt ? `Pay ₦${(receipt.pricing.amountMinor / 100).toLocaleString("en-US")}` : "Confirm booking") : "Continue";
 
-  // What the pill at the bottom left shows: the chosen time once there is one, otherwise the running total.
-  const chosenTime = data.date && data.hour !== null ? `${formatTime(data)} · ${formatDate(data.date)}` : "";
-  const summary = done ? "" : step >= 4 && chosenTime ? chosenTime : total > 0 ? `Total ${money}` : "";
+  // What the pill at the bottom left shows: what you chose, with the time or the price.
+  const when =
+    data.product === "virtual" && data.slotStartsAt
+      ? watLabel(data.slotStartsAt).replace(" (West Africa Time)", "")
+      : data.product === "package" && data.date && data.hour !== null
+        ? `${dayLabel(data.date)} · ${formatTime(data)}`
+        : "";
+  const summary = receipt
+    ? `Total ₦${(receipt.pricing.amountMinor / 100).toLocaleString("en-US")}`
+    : data.product
+      ? data.product === "virtual"
+        ? when || (config ? `Virtual consultation · ₦${(config.virtualFeeMinor / 100).toLocaleString("en-US")}` : "Virtual consultation")
+        : when || "Full treatment package"
+      : "";
 
-  const onPrimary = () => {
-    if (done) {
-      reset();
-      goHome();
+  // A problem from the booking service: say what is wrong and take the visitor to the step that fixes it.
+  const handleProblem = async (r: ActionError) => {
+    if (r.code === "EMAIL_NOT_VERIFIED" || r.code === "EMAIL_CODE_INVALID") {
+      setProof(null);
+      goTo(7);
+      setError(r.message);
       return;
     }
-    if (step === TOTAL_STEPS) {
-      // No payment provider is connected yet, so this only simulates the wait.
-      setPaying(true);
-      payTimer.current = window.setTimeout(() => {
-        setPaying(false);
-        next();
-      }, 1100);
+    if (r.status === 422 && r.fields?.length) {
+      const labels = Array.from(new Set(r.fields.map((f) => FIELD_LABELS[f.path.replace(/^body\./, "")]).filter(Boolean)));
+      goTo(stepForField(r.fields[0].path));
+      setError(labels.length ? `Please check ${labels.join(", ")} and try again.` : `${r.message} ${r.fields[0].message}`);
       return;
     }
-    next();
+    if (r.code === "CONFLICT") {
+      // A time was taken, or the consent wording changed: read the settings again.
+      const sent = config?.consentVersion;
+      const fresh = await loadConfig();
+      if (fresh && sent && fresh.consentVersion !== sent) {
+        set({ consentCare: false, consentShare: false, consentAuthority: false });
+        goTo(8);
+        setError("Our consent wording has changed. Please read it and agree again.");
+        return;
+      }
+      if (data.product === "virtual") {
+        set({ slotId: "", slotStartsAt: "" });
+        goTo(8);
+        setError("That time was just taken. Please choose another.");
+        return;
+      }
+    }
+    setError(r.message);
   };
 
+  const confirmBooking = async () => {
+    if (!config) return;
+    if (!proofIsFresh(proof, data.email) || !proof) {
+      goTo(7);
+      setError("Your email check has expired. Please verify your email again.");
+      return;
+    }
+    const submission = buildSubmission(data, proof.id, config.consentVersion);
+    const files: [string, File][] = [];
+    if (config.reportsAvailable) {
+      if (data.report1) files.push(["patientReport", data.report1]);
+      if (data.report2) files.push(["partnerReport", data.report2]);
+    }
+    // The same booking keeps the same key, so a retry after a lost answer can't create a second booking. Any change gets a new one.
+    const fingerprint = JSON.stringify([submission, files.map(([n, f]) => [n, f.name, f.size])]);
+    const key = idem && idem.fingerprint === fingerprint ? idem.key : crypto.randomUUID();
+    setIdem({ key, fingerprint });
+
+    const form = new FormData();
+    form.append("registration", JSON.stringify(submission));
+    form.append("idempotencyKey", key);
+    for (const [name, f] of files) form.append(name, f, f.name);
+
+    const r = await registerBooking(form);
+    if (!r.ok) return handleProblem(r);
+    setReceipt(r.data);
+  };
+
+  const payNow = async () => {
+    if (!receipt) return;
+    const r = await startPayment(receipt.registrationId);
+    if (!r.ok) {
+      setBusy(false);
+      return handleProblem(r);
+    }
+    if (r.data.reconciliationRequired) {
+      setBusy(false);
+      setError("There's a problem with a payment on this booking, so we've stopped new payments. Please email help@awadoc.com with your reference " + receipt.reference + ".");
+      return;
+    }
+    // A checkout address means go and pay; without one the booking is already paid, so show where it stands.
+    if (r.data.paymentUrl) window.location.assign(r.data.paymentUrl);
+    else router.push(`/booking/${receipt.registrationId}`);
+  };
+
+  const onPrimary = async () => {
+    setError("");
+    if (step < TOTAL_STEPS) {
+      next();
+      return;
+    }
+    setBusy(true);
+    try {
+      if (receipt) await payNow();
+      else await confirmBooking();
+    } finally {
+      // The page is left when the payment page opens; otherwise the button works again.
+      if (!receipt) setBusy(false);
+    }
+  };
+
+  const pct = Math.round((shownStep / shownTotal) * 100);
+  // Until the options are in, only the AwaDoc loader (in the layout) is on screen; the page then arrives with its soft fade in.
+  if (configState === "loading") return null;
   return (
-    <div
-      className={`booking-scope flex min-h-dvh flex-col font-sans text-ink ${leaving ? "book-leave" : "book-fade"}`}
-    >
-      {/* Top bar: logo (back to the home page) and the sun / moon switch. */}
-      <header className="gutter flex w-full items-center justify-between pb-10 pt-5">
-        <Link href="/" onClick={goHome} aria-label="AwaDoc home" className="-ml-1 flex items-center">
-          <Logo className="h-8 w-auto max-sm:h-6" />
-        </Link>
-        <div className="flex items-center gap-2">
-          {/* A round home button: a house in a circle, back to the home page. Same size as the sun / moon switch. */}
-          <Link
-            href="/"
-            onClick={goHome}
-            aria-label="Back to the home page"
-            className="grid size-11 place-items-center rounded-full border border-ink transition-colors hover:border-brand hover:text-brand focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500 max-sm:size-9"
-          >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="size-[18px] max-sm:size-4" aria-hidden="true">
-              <path d="M3 10.5 12 3l9 7.5" />
-              <path d="M5 9.5V20a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V9.5" />
-            </svg>
+    <div className={`booking-scope flex h-dvh flex-col overflow-hidden bg-band font-sans text-ink ${leaving ? "book-leave" : "book-fade"}`}>
+      {/* Floating pill header: logo and "Genomics booking", Help, home and the theme switch. */}
+      <header className="shrink-0 px-6 pt-4 max-sm:px-3">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 rounded-full bg-card py-[clamp(0.375rem,0.25rem+0.4vw,0.625rem)] pr-[clamp(0.375rem,0.3rem+0.3vw,0.75rem)] pl-6 [--icon-btn:clamp(2.25rem,1.95rem+0.9vw,2.75rem)] shadow-[0_1px_2px_rgba(16,24,40,0.04)] ring-1 ring-line/60 max-sm:pl-4">
+          <Link href="/" onClick={goHome} aria-label="AwaDoc home" className="flex items-center gap-3">
+            <Logo className="h-7 w-auto max-sm:h-5" />
+            <span aria-hidden="true" className="h-5 w-px bg-line" />
+            <span className="text-fl-small font-semibold text-muted max-sm:hidden">Genomics booking</span>
           </Link>
-          <ThemeToggle />
+          <div className="flex items-center gap-2">
+            <a
+              href="mailto:help@awadoc.com"
+              className="inline-flex h-(--icon-btn) items-center rounded-full border border-line px-[clamp(0.75rem,0.6rem+0.5vw,1.25rem)] text-fl-small font-semibold text-ink no-underline transition-colors hover:border-brand hover:text-brand focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500"
+            >
+              Help
+            </a>
+            <Link
+              href="/"
+              onClick={goHome}
+              aria-label="Back to the home page"
+              className="grid size-(--icon-btn) place-items-center rounded-full border border-line transition-colors hover:border-brand hover:text-brand focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="size-4.5" aria-hidden="true">
+                <path d="M3 10.5 12 3l9 7.5" />
+                <path d="M5 9.5V20a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V9.5" />
+              </svg>
+            </Link>
+            <ThemeToggle />
+          </div>
         </div>
       </header>
 
-      <div className="gutter book-rise w-full" style={{ animationDelay: "80ms" }}>
-        {/* Title, how far along, and the step count. */}
-        <div className="flex items-end justify-between gap-4">
-          <h1 className="min-w-0 font-heading text-h2 font-medium leading-tight">{cfg.title}</h1>
-          {!done && (
-            <div className="flex shrink-0 items-baseline gap-4 pb-1">
-              <span className="text-hero-sub text-muted">
-                {step}/{TOTAL_STEPS}
-              </span>
-            </div>
-          )}
-        </div>
-
-        {/* Segmented progress: done steps are solid and can be tapped to go back; the current one is half filled. */}
-        {!done && (
-          <ol className="mt-4 flex gap-2" aria-label={`Step ${step} of ${TOTAL_STEPS}: ${cfg.title}`}>
-            {STEPS.map((s, i) => {
-              const n = i + 1;
+      <div className="book-rise min-h-0 flex-1 px-6 pt-4 pb-6 max-sm:px-3 max-sm:pb-3" style={{ animationDelay: "80ms" }}>
+      <div className="mx-auto grid h-full w-full max-w-7xl grid-cols-[minmax(0,1fr)_320px] grid-rows-[minmax(0,1fr)] gap-6 max-lg:grid-cols-1">
+        <section className="flex min-h-0 flex-col rounded-[20px] bg-card p-[clamp(1rem,3.2vh,2rem)] max-sm:p-5" aria-labelledby="book-title">
+          {/* Step count and the segmented bar: done segments go back when tapped. */}
+          <div className="flex shrink-0 items-baseline justify-between gap-3">
+            <p className="m-0 text-fl-kicker font-semibold tracking-[0.08em] text-accent uppercase">
+              Step {shownStep} of {shownTotal}
+            </p>
+          </div>
+          <ol className="mt-2 flex shrink-0 gap-1.5" aria-label={`Step ${shownStep} of ${shownTotal}: ${cfg.title}`}>
+            {visible.map(({ s, n }) => {
               const state = n < step ? "done" : n === step ? "now" : "todo";
               return (
                 <li key={s.title} className="flex-1">
                   <button
                     type="button"
-                    disabled={state !== "done" || paying}
+                    disabled={state !== "done" || busy || locked}
                     onClick={() => goTo(n)}
                     aria-label={state === "done" ? `Go back to ${s.title}` : s.title}
                     aria-current={state === "now" ? "step" : undefined}
                     className="block h-4 w-full cursor-pointer disabled:cursor-default"
                   >
-                    <span className="block h-1 w-full overflow-hidden rounded-full bg-ink/12">
-                      <span
-                        className="block h-full rounded-full bg-[#21ba9b] transition-[width] duration-300"
-                        style={{ width: state === "done" ? "100%" : state === "now" ? "50%" : "0%" }}
-                      />
-                    </span>
+                    <span className={`block h-1.5 w-full rounded-full ${state === "todo" ? "bg-line" : "bg-brand"}`} />
                   </button>
                 </li>
               );
             })}
           </ol>
-        )}
-      </div>
 
-      <main className="gutter book-rise flex w-full flex-1 flex-col pb-8 pt-4" style={{ animationDelay: "180ms" }}>
-        {/* `@container` lets fields go two-up based on the space they have, not the screen's width. */}
-        <div className="@container flex w-full flex-1 flex-col">
-          <div
-            key={step}
-            className={`book-page flex flex-1 flex-col gap-3.5 ${dir === "back" ? "back" : ""}`}
-          >
-            {cfg.sub && <p className="max-w-[44em] text-hero-sub leading-relaxed text-muted">{cfg.sub}</p>}
-            {/* Every step uses the same 24px gap between its rows. */}
-            <div className="flex flex-col [&>*]:gap-6!">
-              <Body />
+          {/* Only this middle part scrolls, and only when a step is taller than the screen; the step count and the buttons stay in view. */}
+          <div ref={scroller} className="min-h-0 flex-1 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <h1 id="book-title" className="mt-[clamp(0.75rem,3vh,2rem)] mb-0 font-heading text-[clamp(1.5rem,min(1.15rem+1.2vw,4.6vh),2.25rem)] leading-[1.1] font-semibold tracking-tight ">
+            {cfg.title}
+          </h1>
+          {/* `@container` lets fields go two-up based on the space they have, not the screen's width. */}
+          <div className="@container mt-3">
+            <div key={step} className={`book-page flex flex-col gap-2.5 ${dir === "back" ? "back" : ""}`}>
+              {cfg.sub && <p className="m-0 max-w-[44em] text-fl-lead leading-relaxed text-muted">{cfg.sub}</p>}
+              <div className="mt-1 flex flex-col *:gap-6!">
+                {configState === "unavailable" ? (
+                  <Notice>Booking isn&apos;t available right now. Please try again later, or email help@awadoc.com.</Notice>
+                ) : (
+                  <Body />
+                )}
+              </div>
+              {error && (
+                <p role="alert" className="rounded-xl border border-[#b23a3f]/40 bg-[#b23a3f]/8 px-4 py-3 text-fl-small leading-snug text-[#b23a3f]">
+                  {error}
+                </p>
+              )}
             </div>
           </div>
-        </div>
-      </main>
+          </div>
 
-      {/* Pinned to the bottom: what you have chosen so far on the left, Back and Continue on the right. */}
-      <div className="book-rise sticky bottom-0 z-10 bg-bg/80 backdrop-blur-md" style={{ animationDelay: "280ms" }}>
-        <div className="gutter flex w-full items-center justify-end gap-3 py-3">
-          {/* The floating Ask Noura pill sits at the left of this bar, so the summary is kept to the right of it
-              and is left out on narrow screens. */}
-          {summary && (
-            <span className="mr-auto hidden h-11 min-w-0 items-center truncate rounded-full border border-ink/15 bg-ink/6 px-4 text-hero-sub font-semibold md:ml-[12.5rem] md:inline-flex">
-              {summary}
-            </span>
-          )}
-          <div className="flex h-11 shrink-0 items-center gap-2">
-            {!done && step > 1 && (
+          <div className="mt-3 flex shrink-0 items-center justify-between gap-3 border-t border-line pt-3 max-sm:flex-col-reverse max-sm:items-stretch">
+            {step > 1 && !locked ? (
               <button
                 type="button"
                 onClick={back}
-                disabled={paying}
-                className="h-11 cursor-pointer rounded-full px-5 text-btn font-semibold text-muted max-sm:px-3 transition-colors hover:text-ink disabled:opacity-40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500"
+                disabled={busy}
+                className="h-[clamp(2.5rem,6vh,3rem)] cursor-pointer rounded-full border border-line px-6 max-sm:w-full text-fl-lead font-semibold text-ink transition-colors hover:border-ink disabled:opacity-40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500"
               >
                 Back
               </button>
+            ) : (
+              <span className="max-sm:hidden" />
             )}
             <button
               type="button"
-              disabled={!ok || paying}
+              disabled={!ok || busy || configState !== "ready"}
               onClick={onPrimary}
-              style={match ? { width: match.w, height: match.h } : undefined}
-              className="flex h-11 cursor-pointer items-center justify-center gap-2 rounded-full bg-ink px-6 text-btn font-semibold text-bg max-sm:h-[clamp(2.25rem,1.9rem+1.1vw,2.75rem)] max-sm:px-2 transition-all duration-200 hover:bg-brand hover:text-[#07110c] disabled:cursor-not-allowed disabled:bg-ink/10 disabled:text-muted/60 motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500"
+              className="flex h-[clamp(2.5rem,6vh,3rem)] cursor-pointer items-center justify-center gap-2 rounded-full bg-brand px-7 max-sm:w-full text-fl-lead font-semibold text-white transition-colors duration-200 hover:bg-brand-hover disabled:cursor-not-allowed disabled:bg-ink/10 disabled:text-muted/60 motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500"
             >
-              {paying && (
-                <span aria-hidden="true" className="size-[1.1em] animate-spin rounded-full border-2 border-current/30 border-t-current motion-reduce:animate-none" />
-              )}
+              {busy && <span aria-hidden="true" className="size-[1.1em] animate-spin rounded-full border-2 border-current/30 border-t-current motion-reduce:animate-none" />}
               <span className="truncate">{label}</span>
             </button>
           </div>
-        </div>
+        </section>
+
+        {/* Summary aside: what you have chosen so far and how far along you are. */}
+        <aside aria-label="Booking summary" className="h-fit rounded-[20px] bg-card p-6 max-lg:hidden">
+          <p className="m-0 text-fl-kicker font-semibold tracking-[0.08em] text-muted uppercase">Your booking</p>
+          <p className="mt-3 mb-0 font-heading text-fl-lead leading-tight font-semibold">{summary || "Nothing chosen yet"}</p>
+          <div className="mt-5 h-1.5 w-full overflow-hidden rounded-full bg-line">
+            <span className="block h-full rounded-full bg-brand transition-[width] duration-300" style={{ width: `${pct}%` }} />
+          </div>
+          <p className="mt-2 mb-0 text-fl-kicker text-muted">{pct}% done</p>
+        </aside>
+      </div>
       </div>
     </div>
   );

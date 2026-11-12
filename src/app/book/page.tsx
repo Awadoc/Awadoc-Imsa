@@ -3,7 +3,7 @@ import BookingFlow from "@/components/BookingFlow";
 
 export const metadata: Metadata = {
   title: "Book | AwaDoc Genomics",
-  description: "Book counselling and procedures for your couple, in six steps.",
+  description: "Book a virtual consultation or the full treatment package for your couple, in ten steps.",
 };
 
 export default function BookPage() {

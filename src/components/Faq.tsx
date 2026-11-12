@@ -102,7 +102,7 @@ const items: { id: string; question: string; answer: ReactNode }[] = [
     id: "together",
     question: "Can we book counselling and procedures together?",
     answer:
-      "Yes. Choose a counselling option and add any procedures in step 4. You pay for everything in one checkout.",
+      "Yes. Choose a counselling option and add any procedures in the first step. You pay for everything in one checkout.",
   },
   {
     id: "edit",
@@ -218,32 +218,22 @@ export default function Faq() {
   const setOpenId = useFaqStore((s) => s.setOpenId);
 
   return (
-    <section
-      id="faq"
-      aria-labelledby={`${uid}-title`}
-      className="gutter relative z-10 scroll-mt-28 py-[calc(var(--spacing-section)*1.5)]"
-    >
-      <div className="mx-auto max-w-[calc(1100*var(--u))]">
-        <h2
-          id={`${uid}-title`}
-          className="text-center font-heading text-h2 max-sm:text-[min(var(--text-h2),calc((100vw-3.6rem)/16.5))] font-medium leading-none [-webkit-text-stroke:0.015em_currentColor]"
-        >
-          FAQs
-        </h2>
-        <p className="mt-[calc(20*var(--u))] text-center text-hero-sub font-medium leading-relaxed tracking-[-0.035em] text-muted">
-          Have more questions?{" "}
-          <button
-            type="button"
-            onClick={openChat}
-            aria-haspopup="dialog"
-            className="cursor-pointer font-bold text-brand transition-opacity hover:opacity-80 focus-visible:underline"
-          >
-            Ask Noura
-          </button>
-        </p>
+    <section id="faq" aria-labelledby={`${uid}-title`} className="scroll-mt-28 bg-band px-6 py-24 max-md:px-4 max-md:py-16">
+      <div className="mx-auto flex max-w-[880px] flex-col gap-10">
+        <div className="flex flex-col items-center gap-3 text-center">
+          <h2 id={`${uid}-title`} className="m-0 font-heading text-fl-h2 leading-[1.1] font-semibold tracking-tight text-ink">
+            FAQs
+          </h2>
+          <p className="m-0 text-fl-body text-muted">
+            Have more questions?{" "}
+            <button type="button" onClick={openChat} aria-haspopup="dialog" className="cursor-pointer font-semibold text-accent transition-colors hover:text-brand focus-visible:underline">
+              Ask Noura
+            </button>
+          </p>
+        </div>
 
-        <div className="mt-[calc(48*var(--u))] overflow-hidden rounded-[calc(28*var(--u))] border border-ink/10 bg-bg/60 backdrop-blur-sm">
-          {items.map((item, i) => {
+        <div className="flex flex-col gap-2">
+          {items.map((item) => {
             const open = openId === item.id;
             const panelId = `${uid}-${item.id}-panel`;
             const buttonId = `${uid}-${item.id}-button`;
@@ -251,28 +241,22 @@ export default function Faq() {
               <div
                 key={item.id}
                 id={`faq-${item.id}`}
-                className={`scroll-mt-28 ${i > 0 ? "border-t border-ink/10" : ""} transition-colors duration-200 ${open ? "bg-ink/4" : "hover:bg-ink/2"}`}
+                className="scroll-mt-28 rounded-2xl bg-card transition-shadow duration-200 hover:shadow-[0_8px_24px_rgba(16,24,40,0.08)] motion-reduce:transition-none"
               >
-                <h3 className="max-sm:text-[calc(var(--text-h3)*0.8)] text-h3 font-medium leading-snug">
+                <h3 className="m-0">
                   <button
                     id={buttonId}
                     type="button"
                     aria-expanded={open}
                     aria-controls={panelId}
                     onClick={() => setOpenId(open ? null : item.id)}
-                    className="flex w-full cursor-pointer items-center justify-between gap-[calc(24*var(--u))] px-card py-card text-left focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-emerald-500"
+                    className={`flex w-full cursor-pointer items-center justify-between gap-4 px-7 text-left font-sans font-semibold text-ink focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-emerald-500 max-md:px-5 ${open ? "pt-6 text-fl-lead" : "py-5 text-fl-body"}`}
                   >
                     <span>{item.question}</span>
-                    <span
-                      aria-hidden="true"
-                      className="flex h-[calc(40*var(--u))] w-[calc(40*var(--u))] shrink-0 items-center justify-center rounded-full border border-ink/15 bg-bg"
-                    >
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="h-[calc(16*var(--u))] w-[calc(16*var(--u))]">
+                    <span aria-hidden="true" className={`inline-flex size-8 shrink-0 items-center justify-center rounded-full ${open ? "bg-brand" : "border border-brand"}`}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={open ? "#ffffff" : "currentColor"} strokeWidth="2.4" className={open ? "" : "text-accent"}>
                         <path d="M5 12h14" />
-                        <path
-                          d="M12 5v14"
-                          className={`origin-center transition-transform duration-200 motion-reduce:transition-none ${open ? "scale-y-0" : "scale-y-100"}`}
-                        />
+                        {!open && <path d="M12 5v14" />}
                       </svg>
                     </span>
                   </button>
@@ -286,9 +270,7 @@ export default function Faq() {
                   className={`grid transition-[grid-template-rows] duration-300 ease-out motion-reduce:transition-none ${open ? "grid-rows-[1fr]" : "grid-rows-[0fr]"}`}
                 >
                   <div className="overflow-hidden">
-                    <div className="px-card pb-card text-hero-sub font-medium leading-relaxed tracking-[-0.035em] text-muted">
-                      {item.answer}
-                    </div>
+                    <div className="flex flex-col gap-3.5 px-7 pt-3.5 pb-6 text-fl-small leading-[1.65] text-muted max-md:px-5 [&_p]:m-0">{item.answer}</div>
                   </div>
                 </div>
               </div>

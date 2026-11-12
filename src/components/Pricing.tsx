@@ -18,59 +18,40 @@ export default function Pricing() {
   const showQuestion = useFaqStore((s) => s.showQuestion);
 
   return (
-    <section
-      id="pricing"
-      aria-label="Pricing"
-      className="gutter relative z-10 pt-[calc(var(--spacing-section)*1.5)]"
-    >
-      <div>
-        <h2 className="mb-[calc(64*var(--u))] max-sm:mb-[calc(24*var(--u))] text-center font-heading text-h2 max-sm:text-[min(var(--text-h2),calc((100vw-3.6rem)/16.5))] font-medium leading-[1.06] [-webkit-text-stroke:0.015em_currentColor]">
-          Know your costs upfront
-        </h2>
-        <div className="grid grid-cols-1 gap-[calc(16*var(--u))] sm:grid-cols-2">
+    <section id="pricing" aria-label="Pricing" className="bg-bg px-6 py-24 max-md:px-4 max-md:py-16">
+      <div className="mx-auto flex max-w-7xl flex-col gap-12 max-md:gap-6">
+        <h2 className="m-0 text-center font-heading text-fl-h2 leading-[1.1] font-semibold tracking-tight text-ink">Know your costs upfront</h2>
+        <div className="grid grid-cols-2 gap-4 max-md:grid-cols-1">
           {plans.map(({ ngn, description, featured }) => {
             const { symbol, digits } = formatPrice(ngn, currency);
             return (
-            <article
-              key={ngn}
-              className={
-                featured
-                  ? `${cardBase} bg-[#0f1a14] text-[#e8f3ec] shadow-[0_16px_36px_-14px_rgba(0,0,0,0.5)] ring-1 ring-white/10`
-                  : `${cardBase} border border-ink/10 bg-bg/50 shadow-[0_1px_2px_rgba(0,0,0,0.04)]`
-              }
-            >
-              {/* Price row: the "View breakdown" button sits on this same line, at the right. */}
-              <div className="flex flex-nowrap items-center justify-between gap-[calc(12*var(--u))]">
-                <p className="whitespace-nowrap font-heading text-price font-medium leading-none [-webkit-text-stroke:0.015em_currentColor]">
-                  {/* Nohemi's naira sign is malformed (it renders as a dot), so the symbol uses Poppins. */}
-                  <span className="font-sans font-semibold [-webkit-text-stroke:0]">{symbol}</span>
-                  {digits}
-                </p>
-                {featured && (
-                  <button
-                    type="button"
-                    onClick={() => showQuestion("cost")}
-                    className="shrink-0 cursor-pointer whitespace-nowrap min-h-11 rounded-[calc(14*var(--u))] bg-[#f5a524] px-[1em] py-[0.5em] text-label font-bold text-[#0f1a14] transition-all duration-200 ease-out hover:-translate-y-0.5 hover:bg-[#ffb73d] hover:shadow-[0_8px_22px_-8px_#f5a524] active:translate-y-0 active:scale-[0.97] motion-reduce:transition-none motion-reduce:hover:translate-y-0 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-500"
-                  >
-                    Breakdown
-                  </button>
-                )}
-              </div>
-              <p
-                className={`mt-auto text-hero-sub font-medium leading-snug tracking-[-0.035em] ${featured ? "text-[#e8f3ec]/70" : "text-muted"}`}
+              <article
+                key={ngn}
+                className={`flex min-h-[180px] flex-col justify-between gap-6 rounded-[20px] border border-line p-8 max-md:min-h-0 max-md:gap-3 transition-shadow duration-200 hover:shadow-[0_8px_24px_rgba(16,24,40,0.08)] motion-reduce:transition-none max-md:p-5 ${featured ? "bg-tint" : "bg-bg"}`}
               >
-                {description}
-              </p>
-            </article>
+                <div className="flex items-start justify-between gap-4">
+                  <p className="m-0 font-heading text-fl-num leading-none font-semibold tracking-[-0.02em] whitespace-nowrap text-ink">
+                    {/* Nohemi's naira sign is malformed (it renders as a dot), so the symbol is drawn in Inter. */}
+                    <span className="font-sans font-semibold [-webkit-text-stroke:0]">{symbol}</span>
+                    {digits}
+                  </p>
+                  {featured && (
+                    <button
+                      type="button"
+                      onClick={() => showQuestion("cost")}
+                      className="inline-flex h-9 shrink-0 cursor-pointer items-center rounded-full border border-brand bg-card px-4 text-[14px] font-semibold whitespace-nowrap text-accent transition-colors duration-200 hover:bg-tint focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-500 in-data-[theme=dark]:hover:bg-band"
+                    >
+                      Breakdown
+                    </button>
+                  )}
+                </div>
+                <span className="text-fl-small text-muted">{description}</span>
+              </article>
             );
           })}
         </div>
 
-        {currency !== "NGN" && (
-          <p className="mt-[calc(14*var(--u))] text-center text-hero-sub font-medium tracking-[-0.035em] text-muted">
-            Prices are set in naira (₦) and shown here converted at approximate rates.
-          </p>
-        )}
+        {currency !== "NGN" && <p className="m-0 text-center text-fl-small text-muted">Prices are set in naira (₦) and shown here converted at approximate rates.</p>}
       </div>
     </section>
   );

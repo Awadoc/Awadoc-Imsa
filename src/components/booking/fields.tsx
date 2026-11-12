@@ -37,14 +37,14 @@ export function Field({
   children: ReactNode;
 }) {
   return (
-    <label className="grid min-w-0 gap-[5px]">
+    <label className="grid min-w-0 gap-1.25">
       <span className="text-micro text-muted">
         {label}
         {required && <Required />}
         {optional && <span className="font-normal"> · optional</span>}
       </span>
       {children}
-      {hint && <span className="text-hero-sub leading-snug text-muted">{hint}</span>}
+      {hint && <span className="text-fl-kicker leading-snug text-muted">{hint}</span>}
     </label>
   );
 }
@@ -201,7 +201,7 @@ export function SelectInput({
             data-pick-menu=""
             role="listbox"
             style={{ left: box.left, top: box.top, width: box.width, maxHeight: box.max }}
-            className="book-pop booking-scope fixed z-[70] overflow-y-auto overscroll-contain rounded-[calc(14*var(--u))] border border-ink/10 bg-bg p-1.5 font-sans text-ink shadow-[0_24px_50px_-18px_rgba(0,50,40,0.45)] sleek-scroll"
+            className="book-pop booking-scope fixed z-70 overflow-y-auto overscroll-contain rounded-[calc(14*var(--u))] border border-ink/10 bg-bg p-1.5 font-sans text-ink shadow-[0_24px_50px_-18px_rgba(0,50,40,0.45)] sleek-scroll"
           >
             {shown.length === 0 ? (
               <p className="p-2.5 text-hero-sub text-muted">No match</p>

@@ -1,0 +1,63 @@
+.logo-loader-wrap {
+  display: inline-grid;
+  place-items: center;
+  line-height: 0;
+}
+
+.logo-loader {
+  height: auto;
+  animation: logo-loader-pulse 1100ms ease-in-out infinite;
+}
+
+.logo-loader.dark {
+  filter: brightness(0.22);
+}
+
+@keyframes logo-loader-pulse {
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: scale(0.78);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.12);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .logo-loader {
+    animation: none;
+  }
+}
+
+/* Full-screen version: a pale, blurred veil over the whole page with the logo in the middle */
+.screen-loader {
+  position: fixed;
+  z-index: 9999;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: color-mix(in srgb, var(--bg, #ffffff) 84%, transparent);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  animation: screen-loader-in 200ms ease both;
+}
+
+@keyframes screen-loader-in {
+  from {
+    opacity: 0;
+  }
+}
+
+/* the loader fades away instead of cutting */
+.screen-loader.leaving {
+  pointer-events: none;
+  animation: screen-loader-out 420ms ease forwards;
+}
+
+@keyframes screen-loader-out {
+  to {
+    opacity: 0;
+  }
+}

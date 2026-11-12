@@ -3,58 +3,53 @@
 import Image from "next/image";
 import { useCallback, useState } from "react";
 import SpecialistProfileModal from "./SpecialistProfileModal";
-import "./Specialist.css";
 
-// Under the photo box: the specialist who leads the care. A portrait led feature: his name huge on the left, his cut out photo
-// on the right. "View full profile" opens his full profile in a modal. The look lives in Specialist.css.
+// The specialist who leads the care: a split card. On the left a pale panel with the words, on the right his photo on a green panel (they stack
+// below 1024px). "View full profile" opens his full profile in a modal.
 export default function Specialist() {
   const [profileOpen, setProfileOpen] = useState(false);
   const closeProfile = useCallback(() => setProfileOpen(false), []);
 
   return (
-    <section className="expert-showcase" id="specialist" aria-labelledby="expert-title">
-      <div className="expert-showcase-inner">
-        <div className="showcase-copy">
-          <p className="showcase-kicker">Nigeria’s IVF pioneer in your corner</p>
-          <h3 id="expert-title">
-            Dr Ibrahim{" "}
-            <span>
-              Wada, OON<small className="showcase-degrees">(MBBS, FRCOG, FWACS, MBA)</small>
-            </span>
-          </h3>
-          <p className="showcase-credentials">
-            <span className="showcase-degrees-mobile">(MBBS, FRCOG, FWACS, MBA)</span>
-            <span style={{ display: "block", marginTop: "0.4em" }}>Chief Medical Advisor, AwaDoc</span>
-            <span style={{ display: "block", marginTop: "0.4em" }}>Founder, Nisa Premier Hospital, Abuja</span>
+    <section id="specialist" aria-labelledby="expert-title" className="bg-bg px-6 pb-24 max-md:px-4 max-md:pb-16">
+      <div className="mx-auto grid max-w-7xl grid-cols-2 gap-4 max-[1024px]:grid-cols-1">
+        <div className="flex flex-col justify-center gap-4 rounded-[20px] bg-[#fafeef] p-14 in-data-[theme=dark]:bg-card max-md:p-7">
+          <span className="text-fl-kicker font-semibold tracking-[0.08em] text-accent uppercase">Nigeria&rsquo;s IVF pioneer in your corner</span>
+          <h2 id="expert-title" className="m-0 font-heading text-fl-name leading-[1.15] font-semibold tracking-[-0.02em] text-ink">
+            Dr Ibrahim Wada, OON <span className="font-sans text-fl-small font-medium tracking-[0.02em] whitespace-nowrap text-[#6b7280] in-data-[theme=dark]:text-muted max-md:mt-1 max-md:block max-md:text-[clamp(10px,3vw,13px)]">(MBBS, FRCOG, FWACS, MBA)</span>
+          </h2>
+          <p className="m-0 text-fl-small leading-[1.6] font-semibold text-ink">
+            Chief Medical Advisor, AwaDoc
+            <br />
+            Founder, Nisa Premier Hospital, Abuja
           </p>
-          <p className="showcase-bio">
-            A pioneer of IVF in Nigeria for over 35 years. He led the team behind Nigeria’s first government authenticated IVF baby in 1998 and
-            reported one of the country’s first sickle cell free births following embryo testing.
+          <p className="m-0 text-fl-body leading-[1.65] text-muted">
+            A pioneer of IVF in Nigeria for over 35 years. He led the team behind Nigeria&rsquo;s first government authenticated IVF baby in 1998 and reported one of the country&rsquo;s first sickle cell free
+            births following embryo testing.
           </p>
-
-          <button type="button" className="showcase-action" aria-haspopup="dialog" onClick={() => setProfileOpen(true)}>
+          <button
+            type="button"
+            aria-haspopup="dialog"
+            onClick={() => setProfileOpen(true)}
+            className="inline-flex w-fit cursor-pointer items-center gap-2 text-fl-small font-semibold text-accent transition-colors hover:text-brand focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-500"
+          >
             View full profile
+            <span className="inline-flex size-6 items-center justify-center rounded-full border border-current">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" aria-hidden="true">
+                <path d="M9 6l6 6-6 6" />
+              </svg>
+            </span>
           </button>
         </div>
 
-        <div className="showcase-portrait">
-          <div className="portrait-halo" aria-hidden="true" />
-          {/* On a wide screen his photo sits in a framed box (this one); below that, the cut out photo is used. */}
+        <div className="relative min-h-130 overflow-hidden rounded-[20px] bg-[#6dbe84] max-md:min-h-105">
           <Image
-            className="showcase-photo"
             src="/team/wada.jpg"
             alt="Dr Ibrahim Wada, fertility specialist and IVF pioneer"
             width={720}
             height={900}
-            sizes="(min-width: 971px) 40vw, 100vw"
-          />
-          <Image
-            className="showcase-cutout"
-            src="/team/wada-portrait.png"
-            alt="Dr Ibrahim Wada, fertility specialist and IVF pioneer"
-            width={1072}
-            height={1976}
-            sizes="(min-width: 971px) 40vw, 90vw"
+            sizes="(min-width: 1025px) 50vw, 100vw"
+            className="absolute inset-0 size-full object-cover object-top"
           />
         </div>
       </div>

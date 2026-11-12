@@ -4,29 +4,27 @@
   /* A shared length unit (1px at 1440px wide) for NON-text sizes only: logo heights, icon
      and avatar sizes, widths. Text uses the fluid tokens in @theme below. */
   --u: clamp(0.8px, 0.0694vw, 1.35px);
-  --bg: #f7faf9;
-  --ink: #0f1a14;
-  --muted: #4a5a51;
+  /* The new design, light theme: white page, #F4F4F4 bands, #1D1D29 headings, #4D545E text, #1FBA9B accent, #12806A links. */
+  --bg: #ffffff;
+  --band: #f4f4f4; /* the grey sections (hero, steps, FAQ) */
+  --card: #ffffff; /* cards sitting on a band */
+  --line: #e6e8eb; /* thin borders */
+  --tint: #e8f8f4; /* the pale mint of the featured price card */
+  --ink: #1d1d29;
+  --muted: #4d545e;
   --helix-o: 0.6; /* how strong the helix is on the hero (dimmed on the white theme) */
-  --accent-ink: #0b6b55; /* mint text that stays readable on the page colour */
+  --accent-ink: #12806a; /* mint text that stays readable on the page colour */
   color-scheme: light;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --bg: #07110c;
-    --ink: #e8f3ec;
-    --muted: #9fb3a8;
-    --helix-o: 1;
-    --accent-ink: #3fd6b6;
-    color-scheme: dark;
-  }
-}
-
 :root[data-theme="dark"] {
-  --bg: #07110c;
-  --ink: #e8f3ec;
-  --muted: #9fb3a8;
+  --bg: #0a0d12;
+  --band: #10131a;
+  --card: #151922;
+  --line: #2a303a;
+  --tint: #0f2a25;
+  --ink: #f2f4f7;
+  --muted: #b4bcc8;
   --helix-o: 1;
   --accent-ink: #3fd6b6;
   color-scheme: dark;
@@ -77,6 +75,16 @@
   --text-partner: clamp(1.125rem, 0.95rem + 0.6vw, 1.75rem);
   --text-store: clamp(0.8125rem, 0.65rem + 0.55vw, 1.125rem);
 
+  /* The new design's sizes, fluid: exactly the design's value from 1280px up, easing down to a phone size at 360px. */
+  --text-fl-h1: clamp(2rem, 1.2175rem + 3.478vw, 4rem); /* 32px -> 64px */
+  --text-fl-h2: clamp(1.75rem, 1.359rem + 1.739vw, 2.75rem); /* 28px -> 44px */
+  --text-fl-name: clamp(1.75rem, 1.554rem + 0.87vw, 2.25rem); /* 28px -> 36px */
+  --text-fl-num: clamp(1.875rem, 1.631rem + 1.087vw, 2.5rem); /* 30px -> 40px */
+  --text-fl-lead: clamp(0.9375rem, 0.889rem + 0.217vw, 1.0625rem); /* 15px -> 17px */
+  --text-fl-body: clamp(0.875rem, 0.826rem + 0.217vw, 1rem); /* 14px -> 16px */
+  --text-fl-small: clamp(0.875rem, 0.8507rem + 0.109vw, 0.9375rem); /* 14px -> 15px */
+  --text-fl-kicker: clamp(0.6875rem, 0.66rem + 0.08vw, 0.75rem); /* 11px -> 12px */
+
   --spacing-btn: clamp(2.25rem, 1.9rem + 1.1vw, 2.75rem); /* button height: 36px at 350 -> 44px at 1440 */
   --spacing-section: clamp(2.5rem, 1rem + 6.667vw, 7rem); /* 40px -> 112px */
   --spacing-card: clamp(1rem, 0.75rem + 1.111vw, 1.75rem); /* 16px -> 28px */
@@ -87,19 +95,44 @@
   --color-ink: var(--ink);
   --color-muted: var(--muted);
   --color-accent: var(--accent-ink);
-  --color-brand: #22bb9b;
-  --font-sans: var(--font-poppins), system-ui, sans-serif;
-  --font-heading: var(--font-nohemi), var(--font-poppins), system-ui, sans-serif;
+  --color-band: var(--band);
+  --color-card: var(--card);
+  --color-line: var(--line);
+  --color-tint: var(--tint);
+  --color-brand: #1fba9b;
+  --color-brand-hover: #179e83;
+  --font-sans: var(--font-inter), system-ui, sans-serif;
+  --font-heading: var(--font-inter-tight), var(--font-inter), system-ui, sans-serif;
 }
 
-/* Every heading uses Nohemi; everything else inherits Poppins from body. */
+/* Page titles and section headings use Inter Tight; smaller headings (h3 and below) stay in Inter. All of them are weight 600, drawn at their
+   true weight (no fake thickening outline). These plain rules win over the weight and outline classes still on older headings. */
+h1,
+h2,
+.font-heading {
+  font-family: var(--font-heading);
+}
 h1,
 h2,
 h3,
 h4,
 h5,
-h6 {
-  font-family: var(--font-heading);
+h6,
+.font-heading {
+  font-weight: 600;
+  -webkit-text-stroke: 0 !important;
+}
+
+/* On the home page every heading (and the big step numbers, prices and footer wordmark) is Nohemi. Nohemi's heaviest file is Medium, so it is
+   used at weight 500 with the same light outline the site used before to give it a little more body. */
+.home-nohemi h1,
+.home-nohemi h2,
+.home-nohemi h3,
+.home-nohemi h4,
+.home-nohemi .font-heading {
+  font-family: var(--font-nohemi), var(--font-heading);
+  font-weight: 500 !important;
+  -webkit-text-stroke: 0.015em currentColor !important;
 }
 
 /* The helix is dimmed a little on the white theme and full strength on the green one. */
@@ -220,18 +253,18 @@ body {
    calc(N*var(--u)) is N px) and the fluid type tokens are fixed sizes. The dropdown lists, which are
    drawn in <body>, carry the same class. */
 .booking-scope {
-  --u: 1px;
-  --text-micro: 11.5px;
-  --text-hero-sub: 13px;
-  --text-label: 12.5px;
-  --text-btn: 12.5px;
-  --text-nav: 12.5px;
-  --text-lead: 18px;
-  --text-h3: 15px;
-  --text-h2: 20px;
-  --text-display: 28px;
-  --spacing-card: 24px;
-  --spacing-btn: 40px;
+  /* The booking page is fluid like the rest of the site: the design's sizes from 1280px up, easing down to a phone size at 360px. */
+  --text-micro: clamp(0.6875rem, 0.66rem + 0.08vw, 0.75rem);
+  --text-hero-sub: clamp(0.8125rem, 0.788rem + 0.109vw, 0.875rem);
+  --text-label: clamp(0.75rem, 0.73rem + 0.08vw, 0.8125rem);
+  --text-btn: clamp(0.875rem, 0.85rem + 0.11vw, 0.9375rem);
+  --text-nav: clamp(0.75rem, 0.7rem + 0.2vw, 0.9375rem);
+  --text-lead: clamp(1rem, 0.94rem + 0.27vw, 1.125rem);
+  --text-h3: clamp(0.875rem, 0.84rem + 0.13vw, 0.9375rem);
+  --text-h2: clamp(1.125rem, 1.05rem + 0.3vw, 1.25rem);
+  --text-display: clamp(1.5rem, 1.4rem + 0.4vw, 1.75rem);
+  --spacing-card: clamp(1.25rem, 1.15rem + 0.43vw, 1.5rem);
+  --spacing-btn: clamp(2.75rem, 2.65rem + 0.435vw, 3rem);
 }
 
 /* A slim, rounded scrollbar with no arrows, for lists that scroll (the booking dropdowns). Chromium and

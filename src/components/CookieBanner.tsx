@@ -41,7 +41,7 @@ export default function CookieBanner() {
       role="dialog"
       aria-label="Cookie choices"
       aria-hidden={!shown}
-      className={`fixed inset-x-4 bottom-[max(1rem,env(safe-area-inset-bottom))] z-40 mx-auto max-h-[calc(100svh-2rem)] max-w-[20rem] overflow-y-auto rounded-[1.4rem] border border-ink/15 bg-bg p-[0.9rem] text-ink shadow-[0_24px_60px_-16px_rgba(0,0,0,0.45)] transition-[opacity,translate,scale] duration-[900ms] ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none sm:inset-x-auto sm:bottom-5 sm:left-auto sm:right-[5vw] sm:mx-0 sm:w-[24rem] sm:max-w-none sm:rounded-3xl sm:p-[calc(20*var(--u))] ${shown ? "translate-y-0 scale-100 opacity-100" : "pointer-events-none translate-y-3 scale-[0.97] opacity-0"}`}
+      className={`fixed inset-x-4 bottom-[max(1rem,env(safe-area-inset-bottom))] z-40 mx-auto max-h-[calc(100svh-2rem)] max-w-[20rem] overflow-y-auto rounded-[1.4rem] border border-ink/15 bg-bg p-[0.9rem] text-ink shadow-[0_24px_60px_-16px_rgba(0,0,0,0.45)] transition-[opacity,translate,scale] duration-900 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none sm:inset-x-auto sm:bottom-5 sm:left-auto sm:right-6 sm:mx-0 sm:w-[24rem] sm:max-w-none sm:rounded-3xl sm:p-[calc(20*var(--u))] ${shown ? "translate-y-0 scale-100 opacity-100" : "pointer-events-none translate-y-3 scale-[0.97] opacity-0"}`}
     >
       {/* The title and the close button share one row, so the cross lines up with "Cookies". */}
       <div className="flex items-center justify-between gap-3">

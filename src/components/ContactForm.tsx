@@ -13,9 +13,9 @@ const COUNTRIES = [
 ];
 
 const field =
-  "mt-[0.3em] w-full rounded-[calc(12*var(--u))] border border-ink/15 bg-ink/4 px-[0.9em] py-[0.5em] text-hero-sub font-medium tracking-[-0.03em] text-ink outline-none transition-colors placeholder:text-muted/70 focus:border-brand";
-const label = "block text-hero-sub font-semibold tracking-[-0.03em]";
-const optional = "text-[0.78em] font-medium text-muted";
+  "mt-1.5 h-12 w-full rounded-xl border border-line bg-card px-4 text-[15px] font-normal text-ink outline-none transition-colors placeholder:text-muted/70 focus:border-brand";
+const label = "block text-[14px] font-semibold text-ink";
+const optional = "text-[13px] font-normal text-muted";
 
 // A drop down in the form's own style: the list opens right under the field (not the browser's tall, blue one), follows the theme, and works with
 // the keyboard (arrow keys, Enter, Escape). It sends its choice with the form through a hidden field.
@@ -53,7 +53,7 @@ function Dropdown({ name, options, placeholder, invalid, onPick }: { name: strin
   }
 
   return (
-    <div ref={box} className="relative text-hero-sub" onKeyDown={onKey}>
+    <div ref={box} className="relative text-[15px]" onKeyDown={onKey}>
       <input type="hidden" name={name} value={value} />
       <button
         type="button"
@@ -68,7 +68,7 @@ function Dropdown({ name, options, placeholder, invalid, onPick }: { name: strin
         {value || placeholder}
       </button>
       {open && (
-        <ul role="listbox" className="absolute left-0 right-0 z-20 mt-1 max-h-56 overflow-y-auto rounded-[calc(12*var(--u))] border border-ink/15 bg-bg p-1 shadow-[0_16px_40px_-16px_rgba(0,0,0,0.45)]">
+        <ul role="listbox" className="absolute left-0 right-0 z-20 mt-1 max-h-56 overflow-y-auto rounded-xl border border-line bg-card p-1 shadow-[0_16px_40px_-16px_rgba(0,0,0,0.45)]">
           {options.map((o, i) => (
             <li
               key={o}
@@ -77,7 +77,7 @@ function Dropdown({ name, options, placeholder, invalid, onPick }: { name: strin
               onPointerDown={(e) => e.preventDefault()}
               onClick={() => pick(o)}
               onMouseEnter={() => setActive(i)}
-              className={`cursor-pointer rounded-[calc(8*var(--u))] px-[0.8em] py-[0.45em] text-hero-sub font-medium tracking-[-0.03em] ${i === active ? "bg-brand/20" : ""} ${o === value ? "text-accent" : "text-ink"}`}
+              className={`cursor-pointer rounded-lg px-3 py-2 text-[15px] ${i === active ? "bg-brand/20" : ""} ${o === value ? "text-accent" : "text-ink"}`}
             >
               {o}
             </li>
@@ -93,6 +93,7 @@ export default function ContactForm() {
   const [sent, setSent] = useState(false);
   const [length, setLength] = useState(0);
   const [noCategory, setNoCategory] = useState(false);
+  const [agreed, setAgreed] = useState(false);
 
   function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -119,26 +120,26 @@ export default function ContactForm() {
 
   if (sent)
     return (
-      <div role="status" className="rounded-3xl border border-ink/10 bg-ink/4 p-[1.6em] text-center">
+      <div role="status" className="rounded-2xl bg-band p-8 text-center">
         <h3 className="font-heading text-h3 font-medium">Almost there</h3>
-        <p className="mt-[0.6em] text-hero-sub font-medium leading-relaxed tracking-[-0.035em] text-muted">
+        <p className="mt-3 text-[15px] leading-relaxed text-muted">
           Your email app should have opened with your message ready. Press send there and the right AwaDoc team will reply within 2 working days.
         </p>
-        <button type="button" onClick={() => setSent(false)} className="mt-[1em] cursor-pointer text-hero-sub font-semibold text-accent underline underline-offset-4">
+        <button type="button" onClick={() => setSent(false)} className="mt-4 cursor-pointer text-[15px] font-semibold text-accent underline underline-offset-4">
           Back to the form
         </button>
       </div>
     );
 
   return (
-    <form onSubmit={onSubmit} className="flex h-full flex-col lg:rounded-3xl lg:border lg:border-brand lg:p-[1em] in-data-[theme=dark]:lg:border-white">
+    <form onSubmit={onSubmit} className="flex h-full flex-col">
 
-      <div className="grid flex-1 gap-[0.6em] sm:grid-cols-2 sm:grid-rows-[repeat(4,auto)_1fr]">
+      <div className="grid flex-1 gap-5 sm:grid-cols-2">
         <label className={`${label} sm:col-span-2`}>
           I am a *
           {/* A styled list that always opens downwards, under the field ("Select a category" is only the prompt, not a choice). */}
           <Dropdown name="category" options={CATEGORIES} placeholder="Select a category" invalid={noCategory} onPick={() => setNoCategory(false)} />
-          {noCategory && <span className="mt-[0.3em] block text-label font-semibold text-red-500">Please choose one.</span>}
+          {noCategory && <span className="mt-1.5 block text-[13px] font-semibold text-red-500">Please choose one.</span>}
         </label>
         <label className={label}>
           Full name *
@@ -160,34 +161,39 @@ export default function ContactForm() {
           Subject *
           <input name="subject" required placeholder="What is this about?" className={field} />
         </label>
-        <label className={`${label} flex flex-col sm:col-span-2`}>
+        <label className={`${label} sm:col-span-2`}>
           Message *
           <textarea
             name="message"
             required
-            rows={2}
+            rows={6}
             maxLength={2000}
             placeholder="Tell us how we can help"
             onChange={(e) => setLength(e.target.value.length)}
-            className={`${field} min-h-16 flex-1 resize-none`}
+            className={`${field} h-auto min-h-40 resize-y py-3`}
           />
-          <span className="mt-[0.2em] block text-right text-label font-medium text-muted">{length} / 2000</span>
+          <span className="mt-1.5 block text-right text-[13px] font-normal text-muted">{length} / 2000</span>
         </label>
       </div>
 
-      <label className="mt-[0.7em] flex cursor-pointer items-start gap-3 text-[calc(var(--text-hero-sub)*0.92)] font-medium leading-relaxed tracking-[-0.03em] text-muted">
-        <input type="checkbox" name="consent" required className="mt-[0.35em] size-4 shrink-0 accent-(--color-brand)" />
+      <label className="mt-5 flex cursor-pointer items-start gap-3 text-[14px] leading-relaxed text-muted">
+        <input type="checkbox" name="consent" required checked={agreed} onChange={(e) => setAgreed(e.target.checked)} className="mt-1 size-4 shrink-0 accent-(--color-brand)" />
         <span>
           I agree that AwaDoc may use these details to reply to me, as described in the{" "}
-          <Link href="/privacy" className="font-semibold text-ink underline underline-offset-4 hover:text-brand">privacy policy</Link>.
+          <Link href="/privacy" className="font-semibold text-accent underline underline-offset-4 hover:text-brand">privacy policy</Link>.
         </span>
       </label>
+      <p className="m-0 mt-4 text-[13px] text-muted">All fields are required unless marked optional.</p>
 
       <button
         type="submit"
-        className="mt-[0.8em] inline-flex min-h-btn w-full cursor-pointer items-center justify-center rounded-[calc(14*var(--u))] border border-ink bg-ink px-[1.4em] py-[0.7em] text-btn font-bold text-bg transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-brand hover:bg-brand hover:text-[#07110c] hover:shadow-[0_10px_28px_-8px_var(--color-brand)] active:translate-y-0 active:scale-[0.97] motion-reduce:transition-none sm:w-fit lg:self-center"
+        disabled={!agreed}
+        className="mt-5 inline-flex h-12 w-fit cursor-pointer items-center justify-center gap-2 rounded-full bg-brand px-7 text-[15px] font-semibold text-white transition-colors duration-200 hover:bg-brand-hover disabled:cursor-not-allowed disabled:opacity-50 motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500 max-sm:w-full"
       >
         Send message
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <path d="M5 12h14M13 6l6 6-6 6" />
+        </svg>
       </button>
     </form>
   );

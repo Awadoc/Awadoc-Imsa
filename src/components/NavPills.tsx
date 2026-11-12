@@ -6,11 +6,36 @@ import { leaveTo } from "@/lib/leaveTo";
 import { useEffect, useRef, useState } from "react";
 import { currencies, useCurrencyStore } from "@/store/useCurrencyStore";
 
-// Plain text links: no icon, no border, no background.
-const pill =
-  "flex h-11 cursor-pointer items-center gap-[0.4em] px-[0.75em] text-nav font-semibold transition-colors duration-200 hover:text-brand focus-visible:text-brand focus-visible:outline-none";
+// The links in the middle of the nav: About, IMSA partnership, FAQ. 15px, weight 500, ink, turning brand green on hover. They are hidden below 768px
+// (the menu button holds them there).
+const link = "text-[15px] font-medium leading-none text-ink no-underline transition-colors duration-200 hover:text-brand focus-visible:text-brand focus-visible:outline-none";
 
-function CurrencyMenu() {
+export default function NavLinks({ faqHref = "#faq" }: { faqHref?: string }) {
+  const router = useRouter();
+  return (
+    <div className="flex items-center gap-8 max-md:hidden">
+      <a href="https://www.awadoc.com/about-us" target="_blank" rel="noopener noreferrer" className={link}>
+        About
+      </a>
+      <Link
+        href="/partnership"
+        onClick={(e) => {
+          e.preventDefault();
+          leaveTo(router, "/partnership");
+        }}
+        className={link}
+      >
+        IMSA partnership
+      </Link>
+      <a href={faqHref} className={link}>
+        FAQ
+      </a>
+    </div>
+  );
+}
+
+// The currency choice: a 44px pill with a brand green outline and a chevron, opening a short list under it.
+export function CurrencyMenu() {
   const { currency, setCurrency } = useCurrencyStore();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -31,145 +56,46 @@ function CurrencyMenu() {
   }, [open]);
 
   return (
-    // Below lg this wrapper is not positioned, so the menu anchors to the nav instead and
-    // opens at the right edge of the screen (smaller). From lg up it opens to the right of the button.
-    // The extra left margin makes the space from FAQ to this button's outline the same as the space from About to FAQ
-    // (each link has 0.75em of padding on both sides, but this button's outline is at its very edge).
-    <div ref={ref} className="ml-[calc(0.75*var(--text-nav))] lg:relative">
+    <div ref={ref} className="relative max-md:hidden">
       <button
         type="button"
         aria-haspopup="listbox"
         aria-expanded={open}
         aria-label={`Currency: ${current.name}`}
         onClick={() => setOpen((o) => !o)}
-        className={`${pill} rounded-full border border-ink/25 hover:border-brand`}
+        className="relative inline-flex h-11 cursor-pointer items-center gap-[0.4em] rounded-full border border-brand bg-card pr-9 pl-[18px] text-[14px] font-semibold text-accent transition-colors duration-200 hover:bg-tint focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500"
       >
-        <span className="font-semibold">{current.symbol}</span>
+        <span>{current.symbol}</span>
         <span>{current.code}</span>
+        <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="pointer-events-none absolute top-[15px] right-3.5">
+          <path d="M6 9l6 6 6-6" />
+        </svg>
       </button>
 
       {open && (
         <ul
           role="listbox"
           aria-label="Choose currency"
-          className="absolute right-[max(1.25rem,env(safe-area-inset-right))] top-[calc(100%-1rem)] z-30 w-[calc(250*var(--u))] max-w-[calc(100vw-2.5rem)] lg:left-0 lg:right-auto lg:top-[calc(100%+8px)] lg:w-[calc(300*var(--u))] divide-y divide-ink/10 overflow-hidden rounded-[calc(18*var(--u))] border border-white/40 bg-linear-to-br from-bg/90 via-bg/82 to-bg/75 shadow-[0_24px_60px_-16px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.5)] backdrop-blur-md"
+          className="book-pop absolute top-[calc(100%+12px)] left-1/2 z-30 w-[240px] -translate-x-1/2 max-w-[calc(100vw-2.5rem)] overflow-hidden rounded-[28px] bg-card py-3 shadow-[0_12px_40px_rgba(16,24,40,0.14)]"
         >
           {currencies.map((c) => (
             <li key={c.code} role="option" aria-selected={c.code === currency}>
-              {/* Fixed columns (symbol, code, name) so every row lines up and the name never wraps. */}
               <button
                 type="button"
                 onClick={() => {
                   setCurrency(c.code);
                   setOpen(false);
                 }}
-                className={`grid w-full cursor-pointer grid-cols-[1.4em_3.2em_1fr] items-center gap-x-[calc(8*var(--u))] min-h-11 px-[1em] py-[0.7em] text-left text-label transition-colors hover:bg-ink/5 ${c.code === currency ? "font-bold text-brand" : "font-medium"}`}
+                className={`grid min-h-[52px] w-full cursor-pointer grid-cols-[1.4em_3.2em_1fr] items-center gap-x-2 px-6 py-3 text-left text-[16px] leading-none transition-colors hover:text-brand focus-visible:text-brand focus-visible:outline-none ${c.code === currency ? "font-semibold text-accent" : "font-medium text-ink"}`}
               >
                 <span className="text-center">{c.symbol}</span>
                 <span>{c.code}</span>
-                <span className={`whitespace-nowrap text-right ${c.code === currency ? "text-brand" : "text-muted"}`}>
-                  {c.name}
-                </span>
+                <span className={`whitespace-nowrap text-right text-[14px] font-normal ${c.code === currency ? "text-accent" : "text-muted"}`}>{c.name}</span>
               </button>
             </li>
           ))}
         </ul>
       )}
-    </div>
-  );
-}
-
-const ABOUT_ITEMS: { label: string; href?: string; internal?: boolean }[] = [
-  { label: "AwaDoc", href: "https://www.awadoc.com/about-us" },
-  { label: "IMSA partnership", href: "/partnership", internal: true },
-];
-
-// "About" opens a short list underneath it. The two choices do not go anywhere yet.
-function AboutMenu() {
-  const router = useRouter();
-  const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!open) return;
-    const onDown = (e: PointerEvent) => {
-      if (!ref.current?.contains(e.target as Node)) setOpen(false);
-    };
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
-    document.addEventListener("pointerdown", onDown);
-    document.addEventListener("keydown", onKey);
-    return () => {
-      document.removeEventListener("pointerdown", onDown);
-      document.removeEventListener("keydown", onKey);
-    };
-  }, [open]);
-
-  return (
-    <div ref={ref} className="relative">
-      <button type="button" aria-haspopup="menu" aria-expanded={open} onClick={() => setOpen((o) => !o)} className={pill}>
-        About
-      </button>
-
-      {open && (
-        <ul
-          role="menu"
-          aria-label="About"
-          className="book-pop absolute left-0 top-[calc(100%+8px)] z-30 w-[calc(230*var(--u))] divide-y divide-ink/10 overflow-hidden rounded-[calc(18*var(--u))] border border-white/40 bg-linear-to-br from-bg/90 via-bg/82 to-bg/75 shadow-[0_24px_60px_-16px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.5)] backdrop-blur-md"
-        >
-          {ABOUT_ITEMS.map(({ label, href, internal }) => (
-            <li key={label} role="none">
-              {href && internal ? (
-                // Inside the site: a client side link, so the page changes without a full reload (and no flash).
-                <Link
-                  href={href}
-                  role="menuitem"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setOpen(false);
-                    leaveTo(router, href);
-                  }}
-                  className="flex min-h-11 w-full cursor-pointer items-center px-[1em] py-[0.7em] text-left text-label font-medium transition-colors hover:bg-ink/5 hover:text-brand"
-                >
-                  {label}
-                </Link>
-              ) : href ? (
-                <a
-                  href={href}
-                  {...(internal ? {} : { target: "_blank", rel: "noopener noreferrer" })}
-                  role="menuitem"
-                  onClick={() => setOpen(false)}
-                  className="flex min-h-11 w-full cursor-pointer items-center px-[1em] py-[0.7em] text-left text-label font-medium transition-colors hover:bg-ink/5 hover:text-brand"
-                >
-                  {label}
-                </a>
-              ) : (
-                <button
-                  type="button"
-                  role="menuitem"
-                  onClick={() => setOpen(false)}
-                  className="flex min-h-11 w-full cursor-pointer items-center px-[1em] py-[0.7em] text-left text-label font-medium transition-colors hover:bg-ink/5 hover:text-brand"
-                >
-                  {label}
-                </button>
-              )}
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
-  );
-}
-
-export default function NavPills() {
-  return (
-    <div className="flex items-center gap-[calc(8*var(--u))]">
-      <AboutMenu />
-
-      <a href="#faq" className={pill}>
-        FAQ
-      </a>
-
-      <CurrencyMenu />
     </div>
   );
 }

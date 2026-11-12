@@ -1,12 +1,13 @@
 "use client";
 
-import { useInProgressStore } from "@/store/useInProgressStore";
+import { useRouter } from "next/navigation";
+import { startBooking } from "@/lib/startBooking";
 
-// "Start booking" on the contact page, as a plain underlined link like "Ask Noura": it does the same as the hero's Start booking button.
+// "Start booking" as a plain link-style button: it does the same as the hero's Start booking button.
 export default function ContactStartBooking({ className }: { className: string }) {
-  const show = useInProgressStore((s) => s.show);
+  const router = useRouter();
   return (
-    <button type="button" onClick={show} aria-haspopup="dialog" className={className}>
+    <button type="button" onClick={() => void startBooking(router)} className={className}>
       Start booking
     </button>
   );

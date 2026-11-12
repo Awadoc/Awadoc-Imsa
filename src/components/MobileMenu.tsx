@@ -40,19 +40,19 @@ export default function MobileMenu() {
   }, [open]);
 
   const row =
-    "flex min-h-11 w-full cursor-pointer items-center justify-between gap-3 px-card py-[0.6em] text-left text-hero-sub font-medium transition-colors hover:bg-ink/5 focus-visible:bg-ink/5 focus-visible:outline-none";
+    "flex min-h-11 w-full cursor-pointer items-center justify-between gap-3 px-card py-[0.6em] text-left text-[15px] font-medium transition-colors hover:bg-band focus-visible:bg-band focus-visible:outline-none";
 
   return (
-    <div ref={ref} className="min-[500px]:hidden">
+    <div ref={ref} className="md:hidden">
       <button
         type="button"
         aria-label={open ? "Close menu" : "Open menu"}
         aria-expanded={open}
         aria-controls={panelId}
         onClick={() => setOpen((o) => !o)}
-        className="flex size-11 cursor-pointer items-center justify-center rounded-full border border-ink max-sm:size-9 transition-colors hover:border-brand hover:text-brand focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500"
+        className="flex size-11 cursor-pointer items-center justify-center rounded-full border border-line bg-card text-ink transition-colors duration-200 hover:border-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500"
       >
-        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="size-5">
+        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="size-4.5">
           {/* Three lines that turn into an X. */}
           <path d="M4 7h16" className={`origin-center transition-transform duration-200 motion-reduce:transition-none ${open ? "translate-y-1.25 rotate-45" : ""}`} />
           <path d="M4 12h16" className={`transition-opacity duration-150 motion-reduce:transition-none ${open ? "opacity-0" : ""}`} />
@@ -64,14 +64,14 @@ export default function MobileMenu() {
           (and clear of notches). The grid-rows trick animates its height. */}
       <div
         id={panelId}
-        className={`absolute inset-x-0 top-[calc(100%-0.75rem)] mx-auto w-[min(calc(100%-4rem),18rem)] grid rounded-[calc(24*var(--u))] border-white/40 bg-linear-to-br from-bg/90 via-bg/82 to-bg/75 shadow-[0_24px_60px_-16px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.5)] backdrop-blur-md transition-[grid-template-rows,opacity] duration-300 ease-out motion-reduce:transition-none ${
+        className={`absolute right-0 top-[calc(100%+0.5rem)] w-[min(calc(100vw-3rem),18rem)] grid rounded-2xl border-line bg-card shadow-[0_8px_24px_rgba(16,24,40,0.12)] transition-[grid-template-rows,opacity] duration-300 ease-out motion-reduce:transition-none ${
           open ? "grid-rows-[1fr] border opacity-100" : "grid-rows-[0fr] border-0 opacity-0"
         }`}
         {...(open ? {} : { inert: true })}
       >
         <div className="overflow-hidden rounded-[inherit]">
           {/* divide-y puts a line between every item, including above the Currency label. */}
-          <nav aria-label="Menu" className="flex flex-col divide-y divide-ink/10">
+          <nav aria-label="Menu" className="flex flex-col divide-y divide-line">
             {/* "About" is a row too: tap it and its two choices slide out below. They do not go anywhere yet. */}
             <button
               type="button"
@@ -127,7 +127,7 @@ export default function MobileMenu() {
               className={row}
             >
               <span>Currency</span>
-              <span className="flex items-center gap-2 text-hero-sub font-normal text-muted">
+              <span className="flex items-center gap-2 text-[15px] font-normal text-muted">
                 {current.symbol} {current.code}
                 <svg
                   aria-hidden="true"
@@ -168,7 +168,7 @@ export default function MobileMenu() {
                         <span className="inline-block w-[1.4em]">{c.symbol}</span>
                         {c.code}
                       </span>
-                      <span className={`text-hero-sub font-normal ${c.code === currency ? "text-brand" : "text-muted"}`}>{c.name}</span>
+                      <span className={`text-[15px] font-normal ${c.code === currency ? "text-brand" : "text-muted"}`}>{c.name}</span>
                     </button>
                   ))}
                 </div>
