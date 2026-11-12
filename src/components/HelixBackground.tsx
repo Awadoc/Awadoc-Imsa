@@ -260,7 +260,9 @@ export default function HelixBackground({
       if (!visible) return;
       const t = (performance.now() - startedAt) / 1000;
       mat.uniforms.uTime.value = t;
-      mat.uniforms.uProgress.value = reduceMotion ? 0 : progressAt(t);
+      // No more bursts: the helix stays formed and just turns. (progressAt is the old burst timeline, kept in case it is wanted back.)
+      mat.uniforms.uProgress.value = 0;
+      void progressAt;
       if (!reduceMotion) helix.rotation.y = t * 0.25;
       tilt.rotation.z += (baseTilt - tilt.rotation.z) * 0.1;
       tilt.rotation.y += (mx * 0.3 - tilt.rotation.y) * 0.05;

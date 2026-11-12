@@ -139,7 +139,7 @@ export default function Journey() {
           aria-label="Journey stages"
           className="m-0 mx-auto grid w-full max-w-280 list-none grid-cols-[44px_minmax(0,1fr)] grid-rows-[repeat(7,auto)] gap-x-3 gap-y-3.5 p-0 md:grid-cols-[minmax(0,1fr)_64px_minmax(0,1fr)] md:gap-x-7 md:gap-y-3"
         >
-          <li aria-hidden="true" className="col-start-1 my-6 w-[3px] justify-self-center rounded-[3px] bg-linear-to-b from-brand via-[#21ba9b] to-brand opacity-60 [grid-row:1/-1] md:col-start-2" />
+          <li aria-hidden="true" className="col-start-1 my-6 w-0.75 justify-self-center rounded-[3px] bg-linear-to-b from-brand via-[#21ba9b] to-brand opacity-60 row-span-full md:col-start-2" />
           {STAGES.map((s, i) => {
             const isAbuja = s.kind === "abuja";
             const left = i % 2 === 0;
@@ -183,8 +183,8 @@ export default function Journey() {
                         </span>
                         <span className="font-heading text-[26px] leading-none font-bold tracking-[-0.04em] md:text-[40px]">0{visit}</span>
                       </div>
-                      <span aria-hidden="true" className="absolute top-11 -left-3 size-6 rounded-full bg-bg md:top-[-12px] md:right-[84px] md:left-auto" />
-                      <span aria-hidden="true" className="absolute top-11 -right-3 size-6 rounded-full bg-bg md:top-auto md:right-[84px] md:bottom-[-12px]" />
+                      <span aria-hidden="true" className="absolute top-11 -left-3 size-6 rounded-full bg-bg md:-top-3 md:right-21 md:left-auto" />
+                      <span aria-hidden="true" className="absolute top-11 -right-3 size-6 rounded-full bg-bg md:top-auto md:right-21 md:-bottom-3" />
                       {abroad && s.trip && (
                         <div className="col-span-full flex items-center gap-2 bg-[#1d1d29] px-5 py-3 text-[13px] font-semibold text-[#21ba9b]">
                           <PlaneIcon className="size-3.75 shrink-0" />
