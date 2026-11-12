@@ -5,7 +5,7 @@ import PageNav from "@/components/PageNav";
 
 // A list item is either plain text or a short bold lead and the rest of the sentence.
 type Item = string | [lead: string, text: string];
-export type Block = { p: string } | { ul: Item[] } | { table: { head: string[]; rows: string[][] } };
+export type Block = { p: string } | { h3: string } | { ul: Item[] } | { ol: Item[] } | { table: { head: string[]; rows: string[][] } };
 export type Section = { title: string; blocks: Block[] };
 
 const EMAIL = "genomics@awadoc.com";
@@ -52,22 +52,24 @@ function Text({ t }: { t: string }) {
 
 // A long legal page: a grey top with a "Legal" kicker, the title and the date it was last updated, then the numbered sections beside a table of
 // contents that follows you down the page.
-export default function LegalPage({ title, updated, intro = [], sections }: { title: string; updated: string; intro?: string[]; sections: Section[] }) {
+export default function LegalPage({ kicker, title, updated, intro = [], sections }: { kicker?: string; title: string; updated?: string; intro?: string[]; sections: Section[] }) {
   return (
     <div data-page className="book-fade bg-bg font-sans text-muted">
       <PageNav />
 
       <header className="bg-band px-6 pt-10 pb-14 max-md:px-4 max-md:pt-6 max-md:pb-10">
         <div className="book-rise mx-auto flex max-w-7xl flex-col items-start gap-4" style={{ animationDelay: "80ms" }}>
-          <span className="text-fl-kicker font-semibold tracking-[0.08em] text-accent uppercase">Legal</span>
+          {kicker && <span className="text-fl-kicker font-semibold tracking-[0.08em] text-accent uppercase">{kicker}</span>}
           <h1 className="m-0 font-heading text-fl-h1 leading-[1.05] font-semibold tracking-[-0.03em] text-ink">{title}</h1>
-          <span className="inline-flex items-center gap-2 rounded-full bg-card px-3.5 py-1.5 text-[13px] font-medium text-muted ring-1 ring-line/60">
+          {updated && (
+            <span className="inline-flex items-center gap-2 rounded-full bg-card px-3.5 py-1.5 text-[13px] font-medium text-muted ring-1 ring-line/60">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="text-accent">
               <rect x="3" y="5" width="18" height="16" rx="2" />
               <path d="M3 10h18M8 3v4M16 3v4" />
             </svg>
             Last updated {updated}
           </span>
+          )}
         </div>
       </header>
 
@@ -90,7 +92,30 @@ export default function LegalPage({ title, updated, intro = [], sections }: { ti
                     {section.title}
                   </h2>
                   {section.blocks.map((block, j) =>
-                    "p" in block ? (
+                    "h3" in block ? (
+                      <h3 key={j} className="m-0 mt-3 font-heading text-[18px] font-semibold text-ink">
+                        {block.h3}
+                      </h3>
+                    ) : "ol" in block ? (
+                      <ol key={j} className={`m-0 flex list-none flex-col gap-3 p-0 ${body}`}>
+                        {block.ol.map((item, n) => (
+                          <li key={typeof item === "string" ? item : item[0]} className="flex gap-3">
+                            <span aria-hidden="true" className="mt-0.5 grid size-6 shrink-0 place-items-center rounded-full bg-tint text-[12px] font-semibold text-accent">
+                              {n + 1}
+                            </span>
+                            <span>
+                              {typeof item === "string" ? (
+                                item
+                              ) : (
+                                <>
+                                  <strong className="font-semibold text-ink">{item[0].replace(/[.:]$/, "")}:</strong> {item[1]}
+                                </>
+                              )}
+                            </span>
+                          </li>
+                        ))}
+                      </ol>
+                    ) : "p" in block ? (
                       <p key={j} className={`m-0 ${body}`}>
                         <Text t={block.p} />
                       </p>
@@ -104,7 +129,7 @@ export default function LegalPage({ title, updated, intro = [], sections }: { ti
                                 item
                               ) : (
                                 <>
-                                  <strong className="font-semibold text-ink">{item[0]}:</strong> {item[1]}
+                                  <strong className="font-semibold text-ink">{item[0].replace(/[.:]$/, "")}:</strong> {item[1]}
                                 </>
                               )}
                             </span>

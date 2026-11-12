@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { leaveTo } from "@/lib/leaveTo";
+import { startBooking } from "@/lib/startBooking";
 import { useEffect, useId, useRef, useState } from "react";
 import { currencies, useCurrencyStore } from "@/store/useCurrencyStore";
 
@@ -40,7 +41,9 @@ export default function MobileMenu() {
   }, [open]);
 
   const row =
-    "flex min-h-11 w-full cursor-pointer items-center justify-between gap-3 px-card py-[0.6em] text-left text-[15px] font-medium transition-colors hover:bg-band focus-visible:bg-band focus-visible:outline-none";
+    "flex min-h-12 w-full cursor-pointer items-center justify-between gap-3 px-6 py-2 text-left font-[family-name:var(--font-nohemi)] text-[17px] font-medium text-ink transition-colors hover:text-brand focus-visible:text-brand focus-visible:outline-none";
+  // The choices that slide out under a row sit a little further in.
+  const subRow = `${row} pl-9 text-[16px]`;
 
   return (
     <div ref={ref} className="md:hidden">
@@ -64,14 +67,13 @@ export default function MobileMenu() {
           (and clear of notches). The grid-rows trick animates its height. */}
       <div
         id={panelId}
-        className={`absolute right-0 top-[calc(100%+0.5rem)] w-[min(calc(100vw-3rem),18rem)] grid rounded-2xl border-line bg-card shadow-[0_8px_24px_rgba(16,24,40,0.12)] transition-[grid-template-rows,opacity] duration-300 ease-out motion-reduce:transition-none ${
+        className={`absolute inset-x-0 top-[calc(100%+0.5rem)] z-40 grid rounded-[28px] border-line bg-card shadow-[0_12px_40px_rgba(16,24,40,0.14)] sm:left-auto sm:w-96 transition-[grid-template-rows,opacity] duration-300 ease-out motion-reduce:transition-none ${
           open ? "grid-rows-[1fr] border opacity-100" : "grid-rows-[0fr] border-0 opacity-0"
         }`}
         {...(open ? {} : { inert: true })}
       >
         <div className="overflow-hidden rounded-[inherit]">
-          {/* divide-y puts a line between every item, including above the Currency label. */}
-          <nav aria-label="Menu" className="flex flex-col divide-y divide-line">
+          <nav aria-label="Menu" className="flex flex-col py-3">
             {/* "About" is a row too: tap it and its two choices slide out below. They do not go anywhere yet. */}
             <button
               type="button"
@@ -80,7 +82,8 @@ export default function MobileMenu() {
               onClick={() => setAboutOpen((o) => !o)}
               className={row}
             >
-              <span>About</span>
+              <span>About Us</span>
+              <span className="font-sans text-[13px] font-semibold text-muted">{aboutOpen ? "Hide" : "View"}</span>
             </button>
             <div
               id={aboutId}
@@ -90,13 +93,13 @@ export default function MobileMenu() {
               {...(aboutOpen ? {} : { inert: true })}
             >
               <div className="overflow-hidden">
-                <div className="flex flex-col divide-y divide-ink/10 border-t border-ink/10">
+                <div className="flex flex-col">
                   <a
                     href="https://www.awadoc.com/about-us"
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={() => setOpen(false)}
-                    className={row}
+                    className={subRow}
                   >
                     AwaDoc
                   </a>
@@ -107,7 +110,7 @@ export default function MobileMenu() {
                       setOpen(false);
                       leaveTo(router, "/partnership");
                     }}
-                    className={row}
+                    className={subRow}
                   >
                     IMSA partnership
                   </Link>
@@ -152,7 +155,7 @@ export default function MobileMenu() {
               {...(currencyOpen ? {} : { inert: true })}
             >
               <div className="overflow-hidden">
-                <div className="flex flex-col divide-y divide-ink/10 border-t border-ink/10">
+                <div className="flex flex-col">
                   {currencies.map((c) => (
                     <button
                       key={c.code}
@@ -162,7 +165,7 @@ export default function MobileMenu() {
                         setOpen(false);
                       }}
                       aria-pressed={c.code === currency}
-                      className={`${row} ${c.code === currency ? "text-brand" : ""}`}
+                      className={`${subRow} ${c.code === currency ? "text-brand" : ""}`}
                     >
                       <span>
                         <span className="inline-block w-[1.4em]">{c.symbol}</span>
@@ -173,6 +176,20 @@ export default function MobileMenu() {
                   ))}
                 </div>
               </div>
+            </div>
+
+            {/* The main action, as in the AwaDoc site menu: a wide outlined pill. */}
+            <div className="mt-2 px-4 pb-1">
+              <button
+                type="button"
+                onClick={() => {
+                  setOpen(false);
+                  void startBooking(router);
+                }}
+                className="flex h-13 w-full cursor-pointer items-center justify-center rounded-full border border-brand bg-card font-[family-name:var(--font-nohemi)] text-[17px] font-semibold text-accent transition-colors hover:bg-tint focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500"
+              >
+                Start booking
+              </button>
             </div>
           </nav>
         </div>

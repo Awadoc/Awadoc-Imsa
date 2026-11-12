@@ -1,27 +1,12 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import ContentsCard from "@/components/ContentsCard";
-import Footer from "@/components/Footer";
-import HomeButton from "@/components/HomeButton";
-import Logo from "@/components/Logo";
-import StickyNav from "@/components/StickyNav";
-import ThemeToggle from "@/components/ThemeToggle";
+import LegalPage, { type Section } from "@/components/LegalPage";
 
 export const metadata: Metadata = {
   title: "The partnership | AwaDoc and IMSA",
   description: "How AwaDoc and IMSA are helping couples who carry the sickle cell gene have children free of the disease.",
 };
 
-// One item of a list: a short bold lead and the rest of the sentence.
-type Item = [lead: string, text: string];
-
-type Block =
-  | { h3: string }
-  | { p: string }
-  | { ol: Item[] }
-  | { ul: Item[] };
-
-const SECTIONS: { title: string; blocks: Block[] }[] = [
+const SECTIONS: Section[] = [
   {
     title: "Introduction",
     blocks: [
@@ -224,89 +209,7 @@ const SECTIONS: { title: string; blocks: Block[] }[] = [
   },
 ];
 
-const slug = (t: string) => t.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim().replace(/ /g, "");
-
-// The text under the page title (centred) and the body text; the body text is justified on a phone.
-const bodyPlain = "text-hero-sub font-medium leading-relaxed tracking-[-0.035em] text-muted";
-const body = `${bodyPlain} max-sm:text-justify`;
-
-function Lead({ item }: { item: Item }) {
-  return (
-    <>
-      <strong className="font-semibold capitalize text-ink">{item[0].replace(/[.:]$/, "")}:</strong> {item[1]}
-    </>
-  );
-}
-
+// The partnership page uses the same layout as the privacy policy: a grey top, then numbered sections beside a contents card.
 export default function PartnershipPage() {
-  return (
-    <div data-page className="book-fade">
-      <StickyNav>
-        <Link href="/" aria-label="AwaDoc home">
-          <Logo className="h-8 w-auto max-sm:h-6" />
-        </Link>
-        <div />
-        <div className="col-start-3 flex items-center gap-[calc(8*var(--u))] justify-self-end">
-          <HomeButton />
-          <ThemeToggle />
-        </div>
-      </StickyNav>
-
-      <main className="gutter relative z-10 pb-[calc(var(--spacing-section)*1.5)] pt-[calc(var(--spacing-section)*0.6)]">
-        <header className="book-rise mx-auto max-w-[56em] text-center" style={{ animationDelay: "120ms" }}>
-          <p className="text-label font-medium uppercase tracking-[0.18em] text-accent">About the partnership</p>
-          <h1 className="mt-[0.8em] font-heading text-display font-medium leading-[1.05] [-webkit-text-stroke:0.015em_currentColor]">
-            AwaDoc × IMSA Genotype Match Programme
-          </h1>
-        </header>
-
-        <div className="mx-auto mt-[calc(var(--spacing-section)*0.5)] grid min-w-0 max-w-[76em] grid-cols-[minmax(0,1fr)] gap-x-[calc(64*var(--u))] gap-y-[calc(40*var(--u))] lg:grid-cols-[minmax(0,1fr)_19em]">
-        <article className="min-w-0">
-          <div className="book-rise" style={{ animationDelay: "300ms" }}>
-
-          {SECTIONS.map((section) => (
-            <section id={slug(section.title)} key={section.title} className="mt-[calc(var(--spacing-section)*0.9)] scroll-mt-28 first:mt-0">
-              <h2 className="font-heading capitalize text-h2 font-medium leading-[1.06] [-webkit-text-stroke:0.015em_currentColor]">
-                {section.title}
-              </h2>
-              {section.blocks.map((block, i) => {
-                if ("h3" in block)
-                  return (
-                    <h3 key={i} className="mt-[1.8em] text-h3 font-semibold capitalize">
-                      {block.h3}
-                    </h3>
-                  );
-                if ("p" in block)
-                  return (
-                    <p key={i} className={`mt-[1em] ${body}`}>
-                      {block.p}
-                    </p>
-                  );
-                const List = "ol" in block ? "ol" : "ul";
-                const items = "ol" in block ? block.ol : block.ul;
-                return (
-                  <List
-                    key={i}
-                    className={`mt-[1em] space-y-[0.8em] ${body} ${"ol" in block ? "list-decimal pl-[1.6em] marker:font-semibold marker:text-accent" : "list-disc pl-[1.4em] marker:text-accent"}`}
-                  >
-                    {items.map((item) => (
-                      <li key={item[0]}>
-                        <Lead item={item} />
-                      </li>
-                    ))}
-                  </List>
-                );
-              })}
-            </section>
-          ))}
-          </div>
-        </article>
-
-          <ContentsCard items={SECTIONS.map((section) => ({ href: `#${slug(section.title)}`, label: section.title }))} />
-        </div>
-      </main>
-
-      <Footer />
-    </div>
-  );
+  return <LegalPage title="AwaDoc × IMSA Genotype Match Programme" sections={SECTIONS} />;
 }

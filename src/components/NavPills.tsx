@@ -16,7 +16,7 @@ export default function NavLinks({ faqHref = "#faq" }: { faqHref?: string }) {
   return (
     <div className="flex items-center gap-8 max-md:hidden">
       <a href="https://www.awadoc.com/about-us" target="_blank" rel="noopener noreferrer" className={link}>
-        About
+        About Us
       </a>
       <Link
         href="/partnership"
