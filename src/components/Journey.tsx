@@ -49,17 +49,17 @@ const ICONS: Record<Kind, string> = {
 const TINT: Record<Kind, string> = {
   online: "bg-[#e6ebff] text-[#26306b] in-data-[theme=dark]:bg-[#1e2340] in-data-[theme=dark]:text-[#e4e8ff]",
   home: "bg-[#fde6db] text-[#6b2e14] in-data-[theme=dark]:bg-[#2c211c] in-data-[theme=dark]:text-[#fbe3d8]",
-  abuja: "bg-[#d4f15a] text-[#1d1d29]",
+  abuja: "bg-[#21ba9b]/20 text-[#1d1d29] in-data-[theme=dark]:bg-[#21ba9b]/25 in-data-[theme=dark]:text-[#e6faf5]",
 };
 const PILL: Record<Kind, string> = {
   online: "bg-white/70 in-data-[theme=dark]:bg-white/10",
   home: "bg-white/70 in-data-[theme=dark]:bg-white/10",
-  abuja: "bg-[#1d1d29]/10",
+  abuja: "bg-current/10",
 };
 const RING: Record<Kind, string> = {
   online: "border-[#9aa6f0] in-data-[theme=dark]:border-[#5a64b8]",
   home: "border-[#f2b79c] in-data-[theme=dark]:border-[#8a5a44]",
-  abuja: "border-[#b8d63a]",
+  abuja: "border-[#21ba9b]",
 };
 const LANES: { kind: Kind; label: string }[] = [
   { kind: "online", label: "Online" },
@@ -127,7 +127,7 @@ export default function Journey() {
         <div className="flex flex-wrap justify-center gap-2.5">
           {LANES.map((l) => (
             <span key={l.kind} className={`inline-flex h-9 items-center gap-2 rounded-full pr-3.5 pl-1.5 text-[13px] font-semibold ${TINT[l.kind]}`}>
-              <span className={`grid size-6.5 place-items-center rounded-full ${l.kind === "abuja" ? "bg-[#1d1d29]/10" : "bg-white/75 in-data-[theme=dark]:bg-white/12"}`}>
+              <span className={`grid size-6.5 place-items-center rounded-full ${l.kind === "abuja" ? "bg-current/10" : "bg-white/75 in-data-[theme=dark]:bg-white/12"}`}>
                 <Svg d={ICONS[l.kind]} className="size-3.5" />
               </span>
               {l.label}
@@ -139,7 +139,7 @@ export default function Journey() {
           aria-label="Journey stages"
           className="m-0 mx-auto grid w-full max-w-280 list-none grid-cols-[44px_minmax(0,1fr)] grid-rows-[repeat(7,auto)] gap-x-3 gap-y-3.5 p-0 md:grid-cols-[minmax(0,1fr)_64px_minmax(0,1fr)] md:gap-x-7 md:gap-y-3"
         >
-          <li aria-hidden="true" className="col-start-1 my-6 w-[3px] justify-self-center rounded-[3px] bg-linear-to-b from-brand via-[#d4f15a] to-brand opacity-60 [grid-row:1/-1] md:col-start-2" />
+          <li aria-hidden="true" className="col-start-1 my-6 w-[3px] justify-self-center rounded-[3px] bg-linear-to-b from-brand via-[#21ba9b] to-brand opacity-60 [grid-row:1/-1] md:col-start-2" />
           {STAGES.map((s, i) => {
             const isAbuja = s.kind === "abuja";
             const left = i % 2 === 0;
@@ -160,11 +160,11 @@ export default function Journey() {
                 >
                   {isAbuja ? (
                     <article
-                      className={`relative grid grid-cols-1 overflow-hidden rounded-[20px] bg-[#d4f15a] text-[#1d1d29] transition-shadow duration-300 md:grid-cols-[minmax(0,1fr)_96px] ${abroad ? "shadow-[0_18px_40px_-20px_rgba(107,127,34,0.7)]" : "shadow-[0_1px_2px_rgba(16,24,40,0.06)]"}`}
+                      className={`relative grid grid-cols-1 overflow-hidden rounded-[20px] bg-[#21ba9b]/20 text-[#1d1d29] in-data-[theme=dark]:bg-[#21ba9b]/25 in-data-[theme=dark]:text-[#e6faf5] transition-shadow duration-300 md:grid-cols-[minmax(0,1fr)_96px] ${abroad ? "shadow-[0_18px_40px_-20px_rgba(33,186,155,0.5)]" : "shadow-[0_1px_2px_rgba(16,24,40,0.06)]"}`}
                     >
-                      <div className="flex flex-col gap-2.5 border-dashed border-[#1d1d29]/25 p-4.5 max-md:border-t-2 md:border-r-2 md:p-6">
+                      <div className="flex flex-col gap-2.5 border-dashed border-current/25 p-4.5 max-md:border-t-2 md:border-r-2 md:p-6">
                         <div className="flex flex-wrap items-center gap-2">
-                          <span className="inline-flex h-7 items-center gap-1.5 rounded-full bg-[#1d1d29]/8 px-2.5 text-xs font-semibold">
+                          <span className="inline-flex h-7 items-center gap-1.5 rounded-full bg-current/10 px-2.5 text-xs font-semibold">
                             <Svg d={ICONS.abuja} className="size-3.25" sw={2} />
                             {s.tag}
                           </span>
@@ -174,7 +174,7 @@ export default function Journey() {
                           </span>
                         </div>
                         <h3 className="m-0 font-sans text-[18px] leading-[1.2] font-semibold tracking-[-0.015em] md:text-[21px]">{s.title}</h3>
-                        <p className="m-0 text-[15px] leading-[1.6] text-[#3a3f2a]">{s.text}</p>
+                        <p className="m-0 text-[15px] leading-[1.6] opacity-85">{s.text}</p>
                       </div>
                       <div className="flex min-h-14 items-center justify-between gap-2 px-4.5 max-md:order-first md:min-h-0 md:flex-col md:justify-center md:gap-0.5 md:px-2 md:py-4">
                         <span className="inline-flex items-center gap-2">
@@ -186,7 +186,7 @@ export default function Journey() {
                       <span aria-hidden="true" className="absolute top-11 -left-3 size-6 rounded-full bg-bg md:top-[-12px] md:right-[84px] md:left-auto" />
                       <span aria-hidden="true" className="absolute top-11 -right-3 size-6 rounded-full bg-bg md:top-auto md:right-[84px] md:bottom-[-12px]" />
                       {abroad && s.trip && (
-                        <div className="col-span-full flex items-center gap-2 bg-[#1d1d29] px-5 py-3 text-[13px] font-semibold text-[#d4f15a]">
+                        <div className="col-span-full flex items-center gap-2 bg-[#1d1d29] px-5 py-3 text-[13px] font-semibold text-[#21ba9b]">
                           <PlaneIcon className="size-3.75 shrink-0" />
                           {s.trip}
                         </div>

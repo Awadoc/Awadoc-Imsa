@@ -81,14 +81,10 @@ export default function LegalPage({ kicker, title, updated, intro = [], sections
                 <Text t={p} />
               </p>
             ))}
-            {sections.map((section, i) => (
-              <section id={slug(section.title)} key={section.title} className="mt-12 grid scroll-mt-28 grid-cols-[2.25rem_minmax(0,1fr)] gap-x-3 first:mt-0 max-sm:grid-cols-[1.9rem_minmax(0,1fr)]">
-                <span aria-hidden="true" className="pt-2 text-[13px] font-semibold text-accent">
-                  {String(i + 1).padStart(2, "0")}
-                </span>
+            {sections.map((section) => (
+              <section id={slug(section.title)} key={section.title} className="mt-12 scroll-mt-28 first:mt-0">
                 <div className="flex min-w-0 flex-col gap-3.5">
                   <h2 className="m-0 font-heading text-[24px] leading-[1.2] font-semibold tracking-[-0.02em] text-ink max-sm:text-[21px]">
-                    <span className="sr-only">{i + 1}. </span>
                     {section.title}
                   </h2>
                   {section.blocks.map((block, j) =>

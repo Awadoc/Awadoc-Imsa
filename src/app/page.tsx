@@ -33,7 +33,7 @@ export default function Home() {
 
       {/* Hero: the words on the left, the DNA helix in a rounded dark card on the right. */}
       <section data-hero className="bg-band px-6 pt-16 pb-24 max-md:px-4 max-md:py-16">
-        <div className="mx-auto grid max-w-7xl grid-cols-2 items-center gap-12 max-[1024px]:grid-cols-1">
+        <div className="mx-auto grid max-w-7xl grid-cols-2 items-center gap-12 max-[1024px]:grid-cols-1 max-[1024px]:gap-6">
           <div className="flex flex-col items-start gap-6">
             <h1 className="m-0 font-heading text-fl-h1 leading-[1.05] font-semibold tracking-[-0.03em] text-ink">
               Your genotype shouldn&apos;t decide <span className="text-brand">who you marry.</span>

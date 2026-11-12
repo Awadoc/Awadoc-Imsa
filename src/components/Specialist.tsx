@@ -42,7 +42,7 @@ export default function Specialist() {
           </button>
         </div>
 
-        <div className="relative min-h-130 overflow-hidden rounded-[20px] bg-[#6dbe84] max-md:min-h-105">
+        <div className="relative min-h-130 overflow-hidden rounded-[20px] bg-[#6dbe84] max-md:min-h-52">
           <Image
             src="/team/wada.jpg"
             alt="Dr Ibrahim Wada, fertility specialist and IVF pioneer"

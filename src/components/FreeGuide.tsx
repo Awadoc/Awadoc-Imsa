@@ -23,10 +23,20 @@ export default function FreeGuide() {
             <div className="relative mt-auto py-4 pr-5 pl-5.5 text-[10.5px] font-semibold text-white">By AwaDoc Research Team</div>
             <i className="absolute right-0 bottom-0 h-27.5 w-17.5 bg-[#ffc301] [clip-path:polygon(100%_0,100%_100%,0_100%)]" />
           </div>
-          <div className="absolute top-0 right-[calc(50%-190px)] flex size-21 rotate-10 items-center justify-center rounded-full bg-[#d4f15a] text-center text-[13px] leading-[1.1] font-bold text-[#1d1d29] shadow-[0_10px_24px_-10px_rgba(10,13,18,0.45)] max-md:right-6">
-            100%
-            <br />
-            free
+          {/* A scalloped flower badge: the shape turns slowly, the words stay put. */}
+          <div className="absolute top-0 right-[calc(50%-190px)] grid size-24 place-items-center text-center text-[13px] max-md:size-16 max-md:text-[11px] leading-[1.1] font-bold text-[#1d1d29] drop-shadow-[0_10px_16px_rgba(10,13,18,0.3)] max-md:-top-3 max-md:-right-3">
+            <svg viewBox="0 0 100 100" className="absolute inset-0 size-full animate-[spin_24s_linear_infinite] fill-[#d4f15a] motion-reduce:animate-none">
+              <circle cx="50" cy="50" r="33" />
+              {Array.from({ length: 8 }, (_, i) => {
+                const a = (i * Math.PI) / 4;
+                return <circle key={i} cx={50 + 33 * Math.cos(a)} cy={50 + 33 * Math.sin(a)} r="15" />;
+              })}
+            </svg>
+            <span className="relative">
+              100%
+              <br />
+              Free
+            </span>
           </div>
         </div>
 

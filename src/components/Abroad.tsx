@@ -60,7 +60,7 @@ export default function Abroad() {
                   <path d={p.icon} />
                 </svg>
               </span>
-              <b className="text-base font-semibold text-ink">{p.title}</b>
+              <b className="text-[clamp(0.8125rem,0.4rem+1.1vw,1rem)] leading-[1.25] font-semibold whitespace-nowrap text-ink">{p.title}</b>
               <span className="text-sm leading-[1.55] text-muted">{p.text}</span>
             </li>
           ))}

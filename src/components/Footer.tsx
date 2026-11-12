@@ -109,7 +109,7 @@ export default function Footer() {
         </div>
       </div>
 
-      <div aria-hidden="true" className="mt-10 text-center font-heading text-[22vw] leading-[0.8] tracking-tighter whitespace-nowrap text-[#151922] select-none" style={{ fontWeight: 700 }}>
+      <div aria-hidden="true" className="mt-10 pb-[3vw] text-center font-heading text-[22vw] leading-[1.05] tracking-tighter whitespace-nowrap text-[#151922] select-none" style={{ fontWeight: 700 }}>
         AwaDoc
       </div>
     </footer>
