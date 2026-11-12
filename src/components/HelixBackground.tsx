@@ -13,6 +13,8 @@ type Props = {
   cycle?: number;
   /** Horizontal offset of the helix on desktop (world units). 0 = centered. */
   offsetX?: number;
+  /** Called once, right after the first frame has been drawn. */
+  onReady?: () => void;
 };
 
 export const GREEN: Palette = {
@@ -157,8 +159,11 @@ export default function HelixBackground({
   palette = GREEN,
   cycle = 20,
   offsetX = 3.1,
+  onReady,
 }: Props) {
   const wrapRef = useRef<HTMLDivElement>(null);
+  const readyRef = useRef(onReady);
+  readyRef.current = onReady;
 
   useEffect(() => {
     const wrap = wrapRef.current;
@@ -268,6 +273,10 @@ export default function HelixBackground({
       tilt.rotation.y += (mx * 0.3 - tilt.rotation.y) * 0.05;
       tilt.rotation.x += (0.15 + my * 0.2 - tilt.rotation.x) * 0.05;
       renderer.render(scene, camera);
+      if (readyRef.current) {
+        readyRef.current();
+        readyRef.current = undefined;
+      }
     };
     frame();
 

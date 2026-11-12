@@ -4,7 +4,8 @@ import FreeGuide from "@/components/FreeGuide";
 import Journey from "@/components/Journey";
 import Faq from "@/components/Faq";
 import Footer from "@/components/Footer";
-import HelixBackground from "@/components/HelixBackground";
+import HeroHelix from "@/components/HeroHelix";
+import HeroIntro from "@/components/HeroIntro";
 import Pricing from "@/components/Pricing";
 import Logo from "@/components/Logo";
 import MobileMenu from "@/components/MobileMenu";
@@ -33,21 +34,19 @@ export default function Home() {
 
       {/* Hero: the words on the left, the DNA helix in a rounded dark card on the right. */}
       <section data-hero className="bg-band px-6 pt-16 pb-24 max-md:px-4 max-md:py-16">
-        <div className="mx-auto grid max-w-7xl grid-cols-2 items-center gap-12 max-[1024px]:grid-cols-1 max-[1024px]:gap-6">
+        <HeroIntro className="mx-auto grid max-w-7xl grid-cols-2 items-center gap-12 max-[1024px]:grid-cols-1 max-[1024px]:gap-6">
           <div className="flex flex-col items-start gap-6">
-            <h1 className="m-0 font-heading text-fl-h1 leading-[1.05] font-semibold tracking-[-0.03em] text-ink">
+            <h1 className="hero-in m-0 font-heading text-fl-h1 leading-[1.05] font-semibold tracking-[-0.03em] text-ink">
               Your genotype shouldn&apos;t decide <span className="text-brand">who you marry.</span>
             </h1>
-            <p className="m-0 max-w-115 text-fl-lead leading-[1.6] text-muted">AS + AS or AS + SS? IVF with embryo testing can prevent sickle cell. Book now, wherever you are.</p>
-            <div className="flex flex-wrap gap-3">
+            <p className="hero-in m-0 max-w-115 text-fl-lead leading-[1.6] text-muted">AS + AS or AS + SS? IVF with embryo testing can prevent sickle cell. Book now, wherever you are.</p>
+            <div className="hero-in flex flex-wrap gap-3">
               <StartBookingButton />
               <ReadMorePgtmButton />
             </div>
           </div>
-          <div aria-hidden="true" className="relative aspect-5/4 overflow-hidden rounded-3xl bg-[#0a0d12]">
-            <HelixBackground className="absolute inset-0 size-full" offsetX={0} />
-          </div>
-        </div>
+          <HeroHelix />
+        </HeroIntro>
       </section>
 
       <ClinicSlider />

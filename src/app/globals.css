@@ -391,3 +391,11 @@ html {
   background-color: var(--bg);
   color: var(--ink);
 }
+
+/* The home page hero: the words and the helix card come in together. Everything marked .hero-in waits (hidden) until the helix has drawn its first frame,
+   then all of it rises at the same moment. */
+.hero-gate:not([data-ready]) .hero-in { opacity: 0; }
+.hero-gate[data-ready] .hero-in { animation: book-rise 650ms cubic-bezier(0.16, 0.8, 0.24, 1) both; }
+@media (prefers-reduced-motion: reduce) {
+  .hero-gate[data-ready] .hero-in { animation: none; }
+}
