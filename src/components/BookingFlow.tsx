@@ -303,6 +303,24 @@ export default function BookingFlow() {
     }
   };
 
+  // Enter goes to the next step (like pressing Continue) when the button is available. Enter on a button, link, list or text area keeps its own job,
+  // and nothing happens while a pop-up (such as the data protection modal) is open.
+  const primaryRef = useRef({ go: onPrimary, can: false });
+  primaryRef.current = { go: onPrimary, can: ok && !busy && configState === "ready" };
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Enter" || e.shiftKey || e.isComposing || e.defaultPrevented) return;
+      const t = e.target as HTMLElement | null;
+      if (t?.closest("button, a, select, textarea, [role='dialog'], [role='listbox']")) return;
+      if (document.querySelector("[aria-modal='true']")) return;
+      if (!primaryRef.current.can) return;
+      e.preventDefault();
+      void primaryRef.current.go();
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, []);
+
   const pct = Math.round((shownStep / shownTotal) * 100);
   // Until the options are in, only the AwaDoc loader (in the layout) is on screen; the page then arrives with its soft fade in.
   if (configState === "loading") return null;

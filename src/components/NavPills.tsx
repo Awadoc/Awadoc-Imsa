@@ -6,9 +6,10 @@ import { leaveTo } from "@/lib/leaveTo";
 import { useEffect, useRef, useState } from "react";
 import { currencies, useCurrencyStore } from "@/store/useCurrencyStore";
 
-// The links in the middle of the nav: About, IMSA partnership, FAQ. 15px, weight 500, ink, turning brand green on hover. They are hidden below 768px
-// (the menu button holds them there).
-const link = "text-[15px] font-medium leading-none text-ink no-underline transition-colors duration-200 hover:text-brand focus-visible:text-brand focus-visible:outline-none";
+// The links in the middle of the nav: About, IMSA partnership, FAQ. Nohemi, 16px, ink. On hover (or keyboard focus) a brand green line is drawn
+// under the link from left to right. They are hidden below 768px (the menu button holds them there).
+const link =
+  "bg-[linear-gradient(var(--color-brand),var(--color-brand))] bg-size-[0%_3px] bg-bottom-left bg-no-repeat py-2 font-[family-name:var(--font-nohemi)] text-[16px] font-medium leading-none text-ink no-underline transition-[background-size] duration-300 ease-out hover:bg-size-[100%_3px] focus-visible:bg-size-[100%_3px] focus-visible:outline-none motion-reduce:transition-none";
 
 export default function NavLinks({ faqHref = "#faq" }: { faqHref?: string }) {
   const router = useRouter();
