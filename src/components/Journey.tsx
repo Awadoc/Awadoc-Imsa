@@ -150,7 +150,7 @@ export default function Journey() {
                 <li
                   aria-hidden="true"
                   style={{ gridRow: i + 1 }}
-                  className={`relative z-1 col-start-1 mt-5 grid size-10 self-start justify-self-center rounded-full border-3 bg-bg font-heading text-base font-bold text-ink transition-opacity duration-300 place-items-center md:col-start-2 md:size-12 ${RING[s.kind]} ${dim ? "opacity-45" : ""}`}
+                  className={`relative z-1 col-start-1 mt-5 grid size-10 self-start justify-self-center rounded-full border-3 bg-bg font-sans text-base leading-none font-bold text-ink transition-opacity duration-300 place-items-center md:col-start-2 md:size-12 ${RING[s.kind]} ${dim ? "opacity-45" : ""}`}
                 >
                   {s.n}
                 </li>
