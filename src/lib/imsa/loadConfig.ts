@@ -10,10 +10,11 @@ export async function loadBookingConfig(): Promise<ImsaConfig | null> {
   try {
     const r = await getConfig();
     if (r.ok && r.data.enabled && r.data.ready) setConfig(r.data, "ready");
-    else setConfig(r.ok ? r.data : null, "unavailable");
+    else setConfig(r.ok ? r.data : null, "unavailable", r.ok ? (r.data.enabled ? "NOT_READY" : "BOOKING_DISABLED") : `${r.code}-${r.status}`);
     return r.ok ? r.data : null;
   } catch {
-    setConfig(null, "unavailable");
+    // The server action itself failed to run (for example the deployed server is missing its settings or the action could not be reached).
+    setConfig(null, "unavailable", "ACTION_FAILED");
     return null;
   }
 }

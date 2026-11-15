@@ -116,6 +116,8 @@ interface BookingState {
   /** The service's settings: null until loaded. */
   config: ImsaConfig | null;
   configState: "loading" | "ready" | "unavailable";
+  /** A short, harmless code saying why the booking is unavailable (shown under the message so a problem can be traced). */
+  configIssue: string | null;
   proof: EmailProof | null;
   /** One key per logical booking submission, so a retry after a lost answer never creates a second booking. */
   idem: { key: string; fingerprint: string } | null;
@@ -123,7 +125,7 @@ interface BookingState {
   receipt: Receipt | null;
   payment: PaymentStatus | null;
   set: (patch: Partial<BookingData>) => void;
-  setConfig: (config: ImsaConfig | null, state: "ready" | "unavailable") => void;
+  setConfig: (config: ImsaConfig | null, state: "ready" | "unavailable", issue?: string) => void;
   setProof: (proof: EmailProof | null) => void;
   setIdem: (idem: { key: string; fingerprint: string } | null) => void;
   setReceipt: (receipt: Receipt | null) => void;
@@ -140,6 +142,7 @@ export const useBookingStore = create<BookingState>((set) => ({
   data: EMPTY,
   config: null,
   configState: "loading",
+  configIssue: null,
   proof: null,
   idem: null,
   receipt: null,
@@ -151,7 +154,7 @@ export const useBookingStore = create<BookingState>((set) => ({
       const proof = s.proof && patch.email !== undefined && patch.email.trim().toLowerCase() !== s.proof.email ? null : s.proof;
       return { data, proof };
     }),
-  setConfig: (config, state) => set({ config, configState: state }),
+  setConfig: (config, state, issue) => set({ config, configState: state, configIssue: state === "ready" ? null : (issue ?? null) }),
   setProof: (proof) => set({ proof }),
   setIdem: (idem) => set({ idem }),
   setReceipt: (receipt) => set({ receipt }),

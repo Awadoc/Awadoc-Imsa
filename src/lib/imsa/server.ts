@@ -6,7 +6,10 @@
 import { cookies, headers } from "next/headers";
 import type { ActionError, ActionResult } from "@/lib/imsa/types";
 
-const BASE = (process.env.IMSA_API_URL ?? "").trim().replace(/\/+$/, "");
+// For now the booking talks to the STAGING API (the production backend does not have the booking endpoints yet). The address is not secret, so it is the
+// built in default; set IMSA_API_URL on the host to point somewhere else (for production later: https://api.awadoc.com).
+const STAGING_URL = "https://awadoc-staging.awadoc.com";
+const BASE = (process.env.IMSA_API_URL || STAGING_URL).trim().replace(/\/+$/, "");
 const KEY = (process.env.IMSA_WEB_API_KEY ?? "").trim();
 
 export const ID_RE = /^[a-f0-9]{24}$/;

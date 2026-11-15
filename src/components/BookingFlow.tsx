@@ -106,7 +106,7 @@ function setThemeColorMeta(color: string) {
 
 export default function BookingFlow() {
   const router = useRouter();
-  const { step, dir, data, next: nextStep, back: backStep, goTo, config, configState, proof, receipt, idem, set, setConfig, setProof, setIdem, setReceipt } = useBookingStore();
+  const { step, dir, data, next: nextStep, back: backStep, goTo, config, configState, configIssue, proof, receipt, idem, set, setConfig, setProof, setIdem, setReceipt } = useBookingStore();
   // Leaving for the home page: the page fades down and away first, then the home page loads and fades in.
   const [leaving, setLeaving] = useState(false);
   const goHome = (e?: { preventDefault: () => void }) => {
@@ -397,7 +397,10 @@ export default function BookingFlow() {
               {cfg.sub && <p className="m-0 max-w-[44em] text-fl-lead leading-relaxed text-muted">{cfg.sub}</p>}
               <div className="mt-1 flex flex-col *:gap-6!">
                 {configState === "unavailable" ? (
-                  <Notice>Booking isn&apos;t available right now. Please try again later, or email help@awadoc.com.</Notice>
+                  <Notice>
+                    Booking isn&apos;t available right now. Please try again later, or email help@awadoc.com.
+                    {configIssue && <span className="mt-1 block text-[12px] opacity-60">Reference: {configIssue}</span>}
+                  </Notice>
                 ) : (
                   <Body />
                 )}
